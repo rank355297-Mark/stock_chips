@@ -1,6 +1,6 @@
 {
  "date": "2026-10-06",
- "generatedAt": "2026-10-08T12:02+08:00",
+ "generatedAt": "2026-10-08T15:47+08:00",
  "tradingDays": [
   "2026-10-06",
   "2026-10-05",
@@ -24,6 +24,7 @@
   "margin": 15,
   "broker": 0
  },
+ "marginPending": [],
  "filters": {
   "minAvgLots": 1000,
   "minPrice": 10,
@@ -151,12 +152,12 @@
    "parts": {
     "inst1": 19.9,
     "inst5": 22.9,
-    "streak": 8.6,
+    "streak": 8.8,
     "margin": 9.3,
     "big": 25,
     "broker": 0
    },
-   "score": 85.7,
+   "score": 85.9,
    "rank": 3,
    "tags": [
     "外資連買5日",
@@ -194,12 +195,12 @@
    "parts": {
     "inst1": 24.7,
     "inst5": 22.5,
-    "streak": 9.4,
+    "streak": 9.5,
     "margin": 13.8,
     "big": 14.6,
     "broker": 0
    },
-   "score": 85.0,
+   "score": 85.1,
    "rank": 4,
    "tags": [
     "投信連買3日",
@@ -326,12 +327,12 @@
    "parts": {
     "inst1": 21.4,
     "inst5": 22.9,
-    "streak": 4.6,
+    "streak": 5.2,
     "margin": 9.7,
     "big": 22.6,
     "broker": 0
    },
-   "score": 81.2,
+   "score": 81.8,
    "rank": 7,
    "tags": [
     "大戶增持"
@@ -539,12 +540,12 @@
    "parts": {
     "inst1": 23.4,
     "inst5": 24.9,
-    "streak": 9.2,
+    "streak": 9.3,
     "margin": 9.0,
     "big": 12.6,
     "broker": 0
    },
-   "score": 79.1,
+   "score": 79.2,
    "rank": 12,
    "tags": [
     "外資連買5日",
@@ -637,6 +638,90 @@
    ]
   },
   {
+   "code": "1326",
+   "name": "台化",
+   "market": "上市",
+   "close": 73.0,
+   "chgPct": 1.96,
+   "avgVol": 32701,
+   "volume": 28012,
+   "foreignNet": 13371,
+   "trustNet": 0,
+   "dealerNet": 197,
+   "instNet": 13568,
+   "instHist": [
+    13568,
+    -2094,
+    23062,
+    -10572,
+    9507
+   ],
+   "inst5d": 33472,
+   "foreignStreak": 1,
+   "trustStreak": 0,
+   "marginChg": -903,
+   "marginBal": 20605,
+   "shortChg": 65,
+   "bigPct": 80.23,
+   "bigChg": 0.04,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 24.1,
+    "inst5": 23.2,
+    "streak": 5.2,
+    "margin": 12.2,
+    "big": 13.0,
+    "broker": 0
+   },
+   "score": 77.7,
+   "rank": 15,
+   "tags": [
+    "5日買超>均量"
+   ]
+  },
+  {
+   "code": "2609",
+   "name": "陽明",
+   "market": "上市",
+   "close": 59.2,
+   "chgPct": 0.85,
+   "avgVol": 13670,
+   "volume": 14016,
+   "foreignNet": 5172,
+   "trustNet": -89,
+   "dealerNet": 221,
+   "instNet": 5304,
+   "instHist": [
+    5304,
+    -2729,
+    5136,
+    -256,
+    6814
+   ],
+   "inst5d": 14269,
+   "foreignStreak": 1,
+   "trustStreak": 0,
+   "marginChg": -480,
+   "marginBal": 30548,
+   "shortChg": -1367,
+   "bigPct": 60.3,
+   "bigChg": -0.03,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 23.9,
+    "inst5": 23.4,
+    "streak": 5.2,
+    "margin": 13.0,
+    "big": 12.1,
+    "broker": 0
+   },
+   "score": 77.6,
+   "rank": 16,
+   "tags": [
+    "5日買超>均量"
+   ]
+  },
+  {
    "code": "3019",
    "name": "亞光",
    "market": "上市",
@@ -667,13 +752,13 @@
    "parts": {
     "inst1": 20.0,
     "inst5": 23.8,
-    "streak": 8.7,
+    "streak": 8.8,
     "margin": 13.9,
     "big": 11.0,
     "broker": 0
    },
-   "score": 77.4,
-   "rank": 15,
+   "score": 77.5,
+   "rank": 17,
    "tags": [
     "外資連買5日",
     "融資大減",
@@ -711,13 +796,13 @@
    "parts": {
     "inst1": 20.7,
     "inst5": 24.6,
-    "streak": 7.8,
+    "streak": 7.6,
     "margin": 6.9,
     "big": 17.0,
     "broker": 0
    },
-   "score": 77.0,
-   "rank": 16,
+   "score": 76.8,
+   "rank": 18,
    "tags": [
     "外資連買3日",
     "5日買超>均量"
@@ -754,99 +839,15 @@
    "parts": {
     "inst1": 18.6,
     "inst5": 24.7,
-    "streak": 8.9,
+    "streak": 8.8,
     "margin": 11.9,
     "big": 12.6,
     "broker": 0
    },
-   "score": 76.7,
-   "rank": 17,
-   "tags": [
-    "外資連買5日",
-    "5日買超>均量"
-   ]
-  },
-  {
-   "code": "1326",
-   "name": "台化",
-   "market": "上市",
-   "close": 73.0,
-   "chgPct": 1.96,
-   "avgVol": 32701,
-   "volume": 28012,
-   "foreignNet": 13371,
-   "trustNet": 0,
-   "dealerNet": 197,
-   "instNet": 13568,
-   "instHist": [
-    13568,
-    -2094,
-    23062,
-    -10572,
-    9507
-   ],
-   "inst5d": 33472,
-   "foreignStreak": 1,
-   "trustStreak": 0,
-   "marginChg": -903,
-   "marginBal": 20605,
-   "shortChg": 65,
-   "bigPct": 80.23,
-   "bigChg": 0.04,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 24.1,
-    "inst5": 23.2,
-    "streak": 4.0,
-    "margin": 12.2,
-    "big": 13.0,
-    "broker": 0
-   },
-   "score": 76.5,
-   "rank": 18,
-   "tags": [
-    "5日買超>均量"
-   ]
-  },
-  {
-   "code": "2609",
-   "name": "陽明",
-   "market": "上市",
-   "close": 59.2,
-   "chgPct": 0.85,
-   "avgVol": 13670,
-   "volume": 14016,
-   "foreignNet": 5172,
-   "trustNet": -89,
-   "dealerNet": 221,
-   "instNet": 5304,
-   "instHist": [
-    5304,
-    -2729,
-    5136,
-    -256,
-    6814
-   ],
-   "inst5d": 14269,
-   "foreignStreak": 1,
-   "trustStreak": 0,
-   "marginChg": -480,
-   "marginBal": 30548,
-   "shortChg": -1367,
-   "bigPct": 60.3,
-   "bigChg": -0.03,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 23.9,
-    "inst5": 23.4,
-    "streak": 4.0,
-    "margin": 13.0,
-    "big": 12.1,
-    "broker": 0
-   },
-   "score": 76.4,
+   "score": 76.6,
    "rank": 19,
    "tags": [
+    "外資連買5日",
     "5日買超>均量"
    ]
   },
@@ -921,12 +922,12 @@
    "parts": {
     "inst1": 22.0,
     "inst5": 25.0,
-    "streak": 9.7,
+    "streak": 9.8,
     "margin": 11.0,
     "big": 25,
     "broker": 0
    },
-   "score": 92.7,
+   "score": 92.8,
    "rank": 1,
    "tags": [
     "外資連買5日",
@@ -965,12 +966,12 @@
    "parts": {
     "inst1": 23.6,
     "inst5": 20.9,
-    "streak": 5.3,
+    "streak": 6.3,
     "margin": 13.0,
     "big": 23.5,
     "broker": 0
    },
-   "score": 86.3,
+   "score": 87.3,
    "rank": 2,
    "tags": [
     "大戶增持",
@@ -1093,12 +1094,12 @@
    "parts": {
     "inst1": 24.5,
     "inst5": 23.5,
-    "streak": 9.3,
+    "streak": 9.4,
     "margin": 13.6,
     "big": 12.1,
     "broker": 0
    },
-   "score": 83.0,
+   "score": 83.1,
    "rank": 5,
    "tags": [
     "外資連買5日",
@@ -1136,12 +1137,12 @@
    "parts": {
     "inst1": 22.3,
     "inst5": 24.2,
-    "streak": 6.6,
+    "streak": 6.3,
     "margin": 3.8,
     "big": 25,
     "broker": 0
    },
-   "score": 81.9,
+   "score": 81.6,
    "rank": 6,
    "tags": [
     "大戶增持"
@@ -1178,12 +1179,12 @@
    "parts": {
     "inst1": 15.4,
     "inst5": 20.0,
-    "streak": 6.7,
+    "streak": 6.3,
     "margin": 12.8,
     "big": 25,
     "broker": 0
    },
-   "score": 79.9,
+   "score": 79.5,
    "rank": 7,
    "tags": [
     "大戶增持"
@@ -1220,12 +1221,12 @@
    "parts": {
     "inst1": 21.7,
     "inst5": 9.8,
-    "streak": 6.9,
+    "streak": 6.3,
     "margin": 14.9,
     "big": 25,
     "broker": 0
    },
-   "score": 78.3,
+   "score": 77.7,
    "rank": 8,
    "tags": [
     "大戶增持",
@@ -1275,49 +1276,6 @@
    ]
   },
   {
-   "code": "8936",
-   "name": "國統",
-   "market": "上櫃",
-   "close": 53.2,
-   "chgPct": 0.19,
-   "avgVol": 1099,
-   "volume": 936,
-   "foreignNet": -2,
-   "trustNet": 0,
-   "dealerNet": 207,
-   "instNet": 205,
-   "instHist": [
-    205,
-    561,
-    329,
-    -42,
-    530
-   ],
-   "inst5d": 1582,
-   "foreignStreak": 0,
-   "trustStreak": 0,
-   "marginChg": -153,
-   "marginBal": 7993,
-   "shortChg": 0,
-   "bigPct": 23.18,
-   "bigChg": -0.35,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 23.3,
-    "inst5": 24.8,
-    "streak": 5.1,
-    "margin": 14.5,
-    "big": 8.1,
-    "broker": 0
-   },
-   "score": 75.8,
-   "rank": 10,
-   "tags": [
-    "融資大減",
-    "5日買超>均量"
-   ]
-  },
-  {
    "code": "3680",
    "name": "家登",
    "market": "上櫃",
@@ -1354,7 +1312,7 @@
     "broker": 0
    },
    "score": 75.8,
-   "rank": 11,
+   "rank": 10,
    "tags": [
     "外資連買5日"
    ]
@@ -1390,13 +1348,13 @@
    "parts": {
     "inst1": 24.1,
     "inst5": 22.9,
-    "streak": 5.9,
+    "streak": 6.3,
     "margin": 9.4,
     "big": 12.9,
     "broker": 0
    },
-   "score": 75.2,
-   "rank": 12,
+   "score": 75.6,
+   "rank": 11,
    "tags": []
   },
   {
@@ -1430,15 +1388,58 @@
    "parts": {
     "inst1": 19.6,
     "inst5": 18.8,
-    "streak": 5.8,
+    "streak": 6.3,
     "margin": 14.4,
     "big": 15.4,
     "broker": 0
    },
-   "score": 74.0,
-   "rank": 13,
+   "score": 74.5,
+   "rank": 12,
    "tags": [
     "融資大減"
+   ]
+  },
+  {
+   "code": "8936",
+   "name": "國統",
+   "market": "上櫃",
+   "close": 53.2,
+   "chgPct": 0.19,
+   "avgVol": 1099,
+   "volume": 936,
+   "foreignNet": -2,
+   "trustNet": 0,
+   "dealerNet": 207,
+   "instNet": 205,
+   "instHist": [
+    205,
+    561,
+    329,
+    -42,
+    530
+   ],
+   "inst5d": 1582,
+   "foreignStreak": 0,
+   "trustStreak": 0,
+   "marginChg": -153,
+   "marginBal": 7993,
+   "shortChg": 0,
+   "bigPct": 23.18,
+   "bigChg": -0.35,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 23.3,
+    "inst5": 24.8,
+    "streak": 2.5,
+    "margin": 14.5,
+    "big": 8.1,
+    "broker": 0
+   },
+   "score": 73.2,
+   "rank": 13,
+   "tags": [
+    "融資大減",
+    "5日買超>均量"
    ]
   },
   {
@@ -1472,17 +1473,57 @@
    "parts": {
     "inst1": 15.5,
     "inst5": 22.6,
-    "streak": 8.6,
+    "streak": 8.5,
     "margin": 14.1,
     "big": 12.5,
     "broker": 0
    },
-   "score": 73.3,
+   "score": 73.2,
    "rank": 14,
    "tags": [
     "外資連買3日",
     "融資大減"
    ]
+  },
+  {
+   "code": "4123",
+   "name": "晟德",
+   "market": "上櫃",
+   "close": 30.8,
+   "chgPct": -0.16,
+   "avgVol": 1041,
+   "volume": 1051,
+   "foreignNet": 260,
+   "trustNet": 0,
+   "dealerNet": -66,
+   "instNet": 194,
+   "instHist": [
+    194,
+    -196,
+    -305,
+    -77,
+    400
+   ],
+   "inst5d": 16,
+   "foreignStreak": 1,
+   "trustStreak": 0,
+   "marginChg": -34,
+   "marginBal": 8893,
+   "shortChg": 0,
+   "bigPct": 52.98,
+   "bigChg": 0.27,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 23.2,
+    "inst5": 15.5,
+    "streak": 6.3,
+    "margin": 12.2,
+    "big": 15.9,
+    "broker": 0
+   },
+   "score": 73.1,
+   "rank": 15,
+   "tags": []
   },
   {
    "code": "4541",
@@ -1521,7 +1562,7 @@
     "broker": 0
    },
    "score": 73.1,
-   "rank": 15,
+   "rank": 16,
    "tags": [
     "外資連買3日",
     "大戶增持"
@@ -1558,13 +1599,13 @@
    "parts": {
     "inst1": 21.4,
     "inst5": 17.9,
-    "streak": 8.3,
+    "streak": 8.5,
     "margin": 12.7,
     "big": 12.5,
     "broker": 0
    },
-   "score": 72.8,
-   "rank": 16,
+   "score": 73.0,
+   "rank": 17,
    "tags": [
     "外資連買3日"
    ]
@@ -1600,13 +1641,13 @@
    "parts": {
     "inst1": 19.4,
     "inst5": 8.9,
-    "streak": 7.8,
+    "streak": 8.0,
     "margin": 11.7,
     "big": 25,
     "broker": 0
    },
-   "score": 72.8,
-   "rank": 17,
+   "score": 73.0,
+   "rank": 18,
    "tags": [
     "大戶增持"
    ]
@@ -1648,91 +1689,52 @@
     "broker": 0
    },
    "score": 72.7,
-   "rank": 18,
+   "rank": 19,
    "tags": [
     "融資大減"
    ]
   },
   {
-   "code": "4123",
-   "name": "晟德",
+   "code": "3718",
+   "name": "中光電投控",
    "market": "上櫃",
-   "close": 30.8,
-   "chgPct": -0.16,
-   "avgVol": 1041,
-   "volume": 1051,
-   "foreignNet": 260,
+   "close": 64.2,
+   "chgPct": -1.23,
+   "avgVol": 1607,
+   "volume": 1563,
+   "foreignNet": 108,
    "trustNet": 0,
-   "dealerNet": -66,
-   "instNet": 194,
+   "dealerNet": 1,
+   "instNet": 110,
    "instHist": [
-    194,
-    -196,
-    -305,
-    -77,
-    400
+    110,
+    47,
+    316,
+    -306,
+    381
    ],
-   "inst5d": 16,
-   "foreignStreak": 1,
+   "inst5d": 549,
+   "foreignStreak": 3,
    "trustStreak": 0,
-   "marginChg": -34,
-   "marginBal": 8893,
-   "shortChg": 0,
-   "bigPct": 52.98,
-   "bigChg": 0.27,
+   "marginChg": -113,
+   "marginBal": 15983,
+   "shortChg": -1,
+   "bigPct": 35.17,
+   "bigChg": -0.35,
    "brokerNet": null,
    "parts": {
-    "inst1": 23.2,
-    "inst5": 15.5,
-    "streak": 5.6,
-    "margin": 12.2,
-    "big": 15.9,
-    "broker": 0
-   },
-   "score": 72.4,
-   "rank": 19,
-   "tags": []
-  },
-  {
-   "code": "6274",
-   "name": "台燿",
-   "market": "上櫃",
-   "close": 1755.0,
-   "chgPct": -1.4,
-   "avgVol": 10067,
-   "volume": 16845,
-   "foreignNet": -122,
-   "trustNet": 1458,
-   "dealerNet": -262,
-   "instNet": 1075,
-   "instHist": [
-    1075,
-    302,
-    -748,
-    -45,
-    630
-   ],
-   "inst5d": 1214,
-   "foreignStreak": 0,
-   "trustStreak": 3,
-   "marginChg": -130,
-   "marginBal": 16731,
-   "shortChg": -33,
-   "bigPct": 53.49,
-   "bigChg": 0.09,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 21.8,
-    "inst5": 17.6,
-    "streak": 9.1,
-    "margin": 10.1,
-    "big": 13.6,
+    "inst1": 20.3,
+    "inst5": 21.7,
+    "streak": 8.5,
+    "margin": 13.6,
+    "big": 8.1,
     "broker": 0
    },
    "score": 72.2,
    "rank": 20,
    "tags": [
-    "投信連買3日"
+    "外資連買3日",
+    "融資大減"
    ]
   }
  ]

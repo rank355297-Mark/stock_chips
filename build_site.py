@@ -97,7 +97,8 @@ def main():
             })
         days.append({"date": doc["date"], "seriesDates": [f"{d.month}/{d.day}" for d in tdays],
                      "tdccDate": doc["tdccDate"], "universe": doc["universe"],
-                     "universeByMarket": doc.get("universeByMarket", {}), "picks": picks})
+                     "universeByMarket": doc.get("universeByMarket", {}),
+                     "marginPending": doc.get("marginPending", []), "picks": picks})
     data = {"generatedAt": dt.datetime.now().strftime("%Y-%m-%d %H:%M"), "days": days}
 
     with open(os.path.join(BASE, "site_template.html"), encoding="utf-8") as f:

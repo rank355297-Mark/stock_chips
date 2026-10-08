@@ -1,6 +1,6 @@
 {
  "date": "2026-10-07",
- "generatedAt": "2026-10-08T12:01+08:00",
+ "generatedAt": "2026-10-08T15:47+08:00",
  "tradingDays": [
   "2026-10-07",
   "2026-10-06",
@@ -24,6 +24,7 @@
   "margin": 15,
   "broker": 0
  },
+ "marginPending": [],
  "filters": {
   "minAvgLots": 1000,
   "minPrice": 10,
@@ -61,12 +62,12 @@
    "parts": {
     "inst1": 17.9,
     "inst5": 24.3,
-    "streak": 8.5,
+    "streak": 8.4,
     "margin": 11.9,
     "big": 25,
     "broker": 0
    },
-   "score": 87.6,
+   "score": 87.5,
    "rank": 1,
    "tags": [
     "外資連買5日",
@@ -105,12 +106,12 @@
    "parts": {
     "inst1": 15.7,
     "inst5": 22.6,
-    "streak": 9.8,
+    "streak": 9.7,
     "margin": 13.7,
     "big": 25,
     "broker": 0
    },
-   "score": 86.8,
+   "score": 86.7,
    "rank": 2,
    "tags": [
     "投信連買5日",
@@ -149,12 +150,12 @@
    "parts": {
     "inst1": 19.1,
     "inst5": 19.8,
-    "streak": 7.4,
+    "streak": 7.5,
     "margin": 13.4,
     "big": 25,
     "broker": 0
    },
-   "score": 84.7,
+   "score": 84.8,
    "rank": 3,
    "tags": [
     "大戶增持",
@@ -192,60 +193,16 @@
    "parts": {
     "inst1": 21.3,
     "inst5": 20.1,
-    "streak": 8.2,
+    "streak": 8.4,
     "margin": 9.9,
     "big": 25,
     "broker": 0
    },
-   "score": 84.5,
+   "score": 84.7,
    "rank": 4,
    "tags": [
     "外資連買5日",
     "大戶增持"
-   ]
-  },
-  {
-   "code": "3055",
-   "name": "蔚華科",
-   "market": "上市",
-   "close": 223.0,
-   "chgPct": 4.45,
-   "avgVol": 1034,
-   "volume": 1232,
-   "foreignNet": 493,
-   "trustNet": 0,
-   "dealerNet": 49,
-   "instNet": 542,
-   "instHist": [
-    542,
-    131,
-    197,
-    251,
-    55
-   ],
-   "inst5d": 1176,
-   "foreignStreak": 5,
-   "trustStreak": 0,
-   "marginChg": -228,
-   "marginBal": 9281,
-   "shortChg": -47,
-   "bigPct": 55.99,
-   "bigChg": -0.02,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 23.3,
-    "inst5": 23.9,
-    "streak": 8.5,
-    "margin": 15.0,
-    "big": 12.2,
-    "broker": 0
-   },
-   "score": 82.9,
-   "rank": 5,
-   "tags": [
-    "外資連買5日",
-    "融資大減",
-    "5日買超>均量"
    ]
   },
   {
@@ -279,59 +236,59 @@
    "parts": {
     "inst1": 23.0,
     "inst5": 24.8,
-    "streak": 8.9,
+    "streak": 9.0,
     "margin": 11.5,
     "big": 14.6,
     "broker": 0
    },
-   "score": 82.8,
-   "rank": 6,
+   "score": 82.9,
+   "rank": 5,
    "tags": [
     "外資連買3日",
     "5日買超>均量"
    ]
   },
   {
-   "code": "2404",
-   "name": "漢唐",
+   "code": "3055",
+   "name": "蔚華科",
    "market": "上市",
-   "close": 1330.0,
-   "chgPct": -0.37,
-   "avgVol": 1659,
-   "volume": 750,
-   "foreignNet": 164,
-   "trustNet": 45,
-   "dealerNet": -33,
-   "instNet": 176,
+   "close": 223.0,
+   "chgPct": 4.45,
+   "avgVol": 1034,
+   "volume": 1232,
+   "foreignNet": 493,
+   "trustNet": 0,
+   "dealerNet": 49,
+   "instNet": 542,
    "instHist": [
-    176,
-    572,
-    460,
-    -29,
-    519
+    542,
+    131,
+    197,
+    251,
+    55
    ],
-   "inst5d": 1697,
+   "inst5d": 1176,
    "foreignStreak": 5,
-   "trustStreak": 1,
-   "marginChg": -25,
-   "marginBal": 1875,
-   "shortChg": 0,
-   "bigPct": 41.77,
-   "bigChg": 0.95,
+   "trustStreak": 0,
+   "marginChg": -228,
+   "marginBal": 9281,
+   "shortChg": -47,
+   "bigPct": 55.99,
+   "bigChg": -0.02,
    "brokerNet": null,
    "parts": {
-    "inst1": 15.9,
-    "inst5": 23.4,
-    "streak": 9.2,
-    "margin": 9.9,
-    "big": 24.4,
+    "inst1": 23.3,
+    "inst5": 23.9,
+    "streak": 8.4,
+    "margin": 15.0,
+    "big": 12.2,
     "broker": 0
    },
    "score": 82.8,
-   "rank": 7,
+   "rank": 6,
    "tags": [
     "外資連買5日",
-    "大戶增持",
+    "融資大減",
     "5日買超>均量"
    ]
   },
@@ -366,16 +323,60 @@
    "parts": {
     "inst1": 24.9,
     "inst5": 24.8,
-    "streak": 7.6,
+    "streak": 7.8,
     "margin": 14.3,
     "big": 10.9,
     "broker": 0
    },
-   "score": 82.5,
-   "rank": 8,
+   "score": 82.7,
+   "rank": 7,
    "tags": [
     "外資連買4日",
     "融資大減",
+    "5日買超>均量"
+   ]
+  },
+  {
+   "code": "2404",
+   "name": "漢唐",
+   "market": "上市",
+   "close": 1330.0,
+   "chgPct": -0.37,
+   "avgVol": 1659,
+   "volume": 750,
+   "foreignNet": 164,
+   "trustNet": 45,
+   "dealerNet": -33,
+   "instNet": 176,
+   "instHist": [
+    176,
+    572,
+    460,
+    -29,
+    519
+   ],
+   "inst5d": 1697,
+   "foreignStreak": 5,
+   "trustStreak": 1,
+   "marginChg": -25,
+   "marginBal": 1875,
+   "shortChg": 0,
+   "bigPct": 41.77,
+   "bigChg": 0.95,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 15.9,
+    "inst5": 23.4,
+    "streak": 9.1,
+    "margin": 9.9,
+    "big": 24.4,
+    "broker": 0
+   },
+   "score": 82.7,
+   "rank": 8,
+   "tags": [
+    "外資連買5日",
+    "大戶增持",
     "5日買超>均量"
    ]
   },
@@ -410,12 +411,12 @@
    "parts": {
     "inst1": 20.5,
     "inst5": 24.7,
-    "streak": 8.2,
+    "streak": 8.4,
     "margin": 14.9,
     "big": 12.6,
     "broker": 0
    },
-   "score": 80.9,
+   "score": 81.1,
    "rank": 9,
    "tags": [
     "外資連買5日",
@@ -454,12 +455,12 @@
    "parts": {
     "inst1": 24.0,
     "inst5": 24.9,
-    "streak": 8.3,
+    "streak": 8.4,
     "margin": 14.5,
     "big": 8.1,
     "broker": 0
    },
-   "score": 79.8,
+   "score": 79.9,
    "rank": 10,
    "tags": [
     "外資連買5日",
@@ -512,6 +513,90 @@
    ]
   },
   {
+   "code": "1609",
+   "name": "大亞",
+   "market": "上市",
+   "close": 39.0,
+   "chgPct": 1.69,
+   "avgVol": 3979,
+   "volume": 6046,
+   "foreignNet": 3036,
+   "trustNet": 0,
+   "dealerNet": 88,
+   "instNet": 3124,
+   "instHist": [
+    3124,
+    1510,
+    -56,
+    517,
+    -1443
+   ],
+   "inst5d": 3651,
+   "foreignStreak": 2,
+   "trustStreak": 0,
+   "marginChg": -201,
+   "marginBal": 11897,
+   "shortChg": 3,
+   "bigPct": 28.99,
+   "bigChg": 0.05,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 24.2,
+    "inst5": 22.8,
+    "streak": 6.1,
+    "margin": 13.3,
+    "big": 13.1,
+    "broker": 0
+   },
+   "score": 79.5,
+   "rank": 12,
+   "tags": [
+    "融資大減"
+   ]
+  },
+  {
+   "code": "1802",
+   "name": "台玻",
+   "market": "上市",
+   "close": 65.7,
+   "chgPct": 9.87,
+   "avgVol": 36605,
+   "volume": 108469,
+   "foreignNet": 17211,
+   "trustNet": 0,
+   "dealerNet": 6233,
+   "instNet": 23444,
+   "instHist": [
+    23444,
+    6778,
+    3407,
+    5203,
+    -4675
+   ],
+   "inst5d": 34157,
+   "foreignStreak": 4,
+   "trustStreak": 0,
+   "marginChg": -710,
+   "marginBal": 36468,
+   "shortChg": 851,
+   "bigPct": 74.5,
+   "bigChg": 0.13,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 23.9,
+    "inst5": 23.1,
+    "streak": 7.8,
+    "margin": 10.4,
+    "big": 14.1,
+    "broker": 0
+   },
+   "score": 79.3,
+   "rank": 13,
+   "tags": [
+    "外資連買4日"
+   ]
+  },
+  {
    "code": "1301",
    "name": "台塑",
    "market": "上市",
@@ -548,7 +633,7 @@
     "broker": 0
    },
    "score": 79.3,
-   "rank": 12,
+   "rank": 14,
    "tags": [
     "外資連買4日",
     "5日買超>均量"
@@ -591,93 +676,9 @@
     "broker": 0
    },
    "score": 79.0,
-   "rank": 13,
-   "tags": [
-    "外資連買5日",
-    "融資大減"
-   ]
-  },
-  {
-   "code": "1802",
-   "name": "台玻",
-   "market": "上市",
-   "close": 65.7,
-   "chgPct": 9.87,
-   "avgVol": 36605,
-   "volume": 108469,
-   "foreignNet": 17211,
-   "trustNet": 0,
-   "dealerNet": 6233,
-   "instNet": 23444,
-   "instHist": [
-    23444,
-    6778,
-    3407,
-    5203,
-    -4675
-   ],
-   "inst5d": 34157,
-   "foreignStreak": 4,
-   "trustStreak": 0,
-   "marginChg": -710,
-   "marginBal": 36468,
-   "shortChg": 851,
-   "bigPct": 74.5,
-   "bigChg": 0.13,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 23.9,
-    "inst5": 23.1,
-    "streak": 7.5,
-    "margin": 10.4,
-    "big": 14.1,
-    "broker": 0
-   },
-   "score": 79.0,
-   "rank": 14,
-   "tags": [
-    "外資連買4日"
-   ]
-  },
-  {
-   "code": "1609",
-   "name": "大亞",
-   "market": "上市",
-   "close": 39.0,
-   "chgPct": 1.69,
-   "avgVol": 3979,
-   "volume": 6046,
-   "foreignNet": 3036,
-   "trustNet": 0,
-   "dealerNet": 88,
-   "instNet": 3124,
-   "instHist": [
-    3124,
-    1510,
-    -56,
-    517,
-    -1443
-   ],
-   "inst5d": 3651,
-   "foreignStreak": 2,
-   "trustStreak": 0,
-   "marginChg": -201,
-   "marginBal": 11897,
-   "shortChg": 3,
-   "bigPct": 28.99,
-   "bigChg": 0.05,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 24.2,
-    "inst5": 22.8,
-    "streak": 5.4,
-    "margin": 13.3,
-    "big": 13.1,
-    "broker": 0
-   },
-   "score": 78.8,
    "rank": 15,
    "tags": [
+    "外資連買5日",
     "融資大減"
    ]
   },
@@ -712,12 +713,12 @@
    "parts": {
     "inst1": 24.6,
     "inst5": 24.5,
-    "streak": 7.2,
+    "streak": 7.3,
     "margin": 8.8,
     "big": 12.8,
     "broker": 0
    },
-   "score": 77.9,
+   "score": 78.0,
    "rank": 16,
    "tags": [
     "外資連買3日",
@@ -755,12 +756,12 @@
    "parts": {
     "inst1": 21.7,
     "inst5": 22.1,
-    "streak": 5.9,
+    "streak": 6.1,
     "margin": 9.7,
     "big": 18.4,
     "broker": 0
    },
-   "score": 77.8,
+   "score": 78.0,
    "rank": 17,
    "tags": []
   },
@@ -837,57 +838,56 @@
    "parts": {
     "inst1": 18.4,
     "inst5": 22.2,
-    "streak": 8.6,
+    "streak": 8.4,
     "margin": 11.9,
     "big": 16.4,
     "broker": 0
    },
-   "score": 77.5,
+   "score": 77.3,
    "rank": 19,
    "tags": [
     "外資連買5日"
    ]
   },
   {
-   "code": "1605",
-   "name": "華新",
+   "code": "1308",
+   "name": "亞聚",
    "market": "上市",
-   "close": 39.9,
-   "chgPct": 2.97,
-   "avgVol": 29928,
-   "volume": 47345,
-   "foreignNet": 22628,
-   "trustNet": 2594,
-   "dealerNet": 859,
-   "instNet": 26081,
+   "close": 14.75,
+   "chgPct": 2.79,
+   "avgVol": 1276,
+   "volume": 2136,
+   "foreignNet": 1096,
+   "trustNet": 0,
+   "dealerNet": -6,
+   "instNet": 1090,
    "instHist": [
-    26081,
-    2614,
-    2476,
-    6592,
-    -3164
+    1090,
+    357,
+    -256,
+    773,
+    -346
    ],
-   "inst5d": 34599,
-   "foreignStreak": 4,
-   "trustStreak": 1,
-   "marginChg": 506,
-   "marginBal": 42648,
-   "shortChg": 130,
-   "bigPct": 72.99,
-   "bigChg": 0.29,
+   "inst5d": 1617,
+   "foreignStreak": 2,
+   "trustStreak": 0,
+   "marginChg": -6,
+   "marginBal": 6415,
+   "shortChg": 2,
+   "bigPct": 50.09,
+   "bigChg": 0.16,
    "brokerNet": null,
    "parts": {
-    "inst1": 24.5,
-    "inst5": 24.0,
-    "streak": 8.8,
-    "margin": 3.6,
-    "big": 16.1,
+    "inst1": 24.3,
+    "inst5": 24.2,
+    "streak": 6.1,
+    "margin": 7.9,
+    "big": 14.5,
     "broker": 0
    },
    "score": 77.0,
    "rank": 20,
    "tags": [
-    "外資連買4日",
     "5日買超>均量"
    ]
   },
@@ -966,12 +966,12 @@
    "parts": {
     "inst1": 23.9,
     "inst5": 20.6,
-    "streak": 8.4,
+    "streak": 8.5,
     "margin": 12.4,
     "big": 19.4,
     "broker": 0
    },
-   "score": 84.7,
+   "score": 84.8,
    "rank": 2,
    "tags": [
     "外資連買3日",
@@ -1051,12 +1051,12 @@
    "parts": {
     "inst1": 17.5,
     "inst5": 22.8,
-    "streak": 8.0,
+    "streak": 7.9,
     "margin": 9.9,
     "big": 25,
     "broker": 0
    },
-   "score": 83.2,
+   "score": 83.1,
    "rank": 4,
    "tags": [
     "大戶增持"
@@ -1093,12 +1093,12 @@
    "parts": {
     "inst1": 17.9,
     "inst5": 20.8,
-    "streak": 8.1,
+    "streak": 7.9,
     "margin": 9.5,
     "big": 25,
     "broker": 0
    },
-   "score": 81.3,
+   "score": 81.1,
    "rank": 5,
    "tags": [
     "大戶增持"
@@ -1135,12 +1135,12 @@
    "parts": {
     "inst1": 22.3,
     "inst5": 20.1,
-    "streak": 8.2,
+    "streak": 7.9,
     "margin": 5.0,
     "big": 25,
     "broker": 0
    },
-   "score": 80.6,
+   "score": 80.3,
    "rank": 6,
    "tags": [
     "大戶增持"
@@ -1177,12 +1177,12 @@
    "parts": {
     "inst1": 23.3,
     "inst5": 21.1,
-    "streak": 8.6,
+    "streak": 8.5,
     "margin": 14.1,
     "big": 12.5,
     "broker": 0
    },
-   "score": 79.6,
+   "score": 79.5,
    "rank": 7,
    "tags": [
     "外資連買3日",
@@ -1303,12 +1303,12 @@
    "parts": {
     "inst1": 19.2,
     "inst5": 19.8,
-    "streak": 9.1,
+    "streak": 9.0,
     "margin": 13.1,
     "big": 15.2,
     "broker": 0
    },
-   "score": 76.4,
+   "score": 76.3,
    "rank": 10,
    "tags": [
     "外資連買4日"
@@ -1387,100 +1387,15 @@
    "parts": {
     "inst1": 20.9,
     "inst5": 23.6,
-    "streak": 9.4,
+    "streak": 9.3,
     "margin": 4.9,
     "big": 15.5,
     "broker": 0
    },
-   "score": 74.3,
+   "score": 74.2,
    "rank": 12,
    "tags": [
     "外資連買5日"
-   ]
-  },
-  {
-   "code": "6217",
-   "name": "中探針",
-   "market": "上櫃",
-   "close": 173.0,
-   "chgPct": -0.57,
-   "avgVol": 2912,
-   "volume": 2567,
-   "foreignNet": 383,
-   "trustNet": 0,
-   "dealerNet": 0,
-   "instNet": 383,
-   "instHist": [
-    383,
-    -430,
-    237,
-    464,
-    -54
-   ],
-   "inst5d": 600,
-   "foreignStreak": 1,
-   "trustStreak": 0,
-   "marginChg": -579,
-   "marginBal": 13480,
-   "shortChg": 2,
-   "bigPct": 16.16,
-   "bigChg": 0.04,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 20.0,
-    "inst5": 19.2,
-    "streak": 6.4,
-    "margin": 14.5,
-    "big": 13.0,
-    "broker": 0
-   },
-   "score": 73.1,
-   "rank": 13,
-   "tags": [
-    "融資大減"
-   ]
-  },
-  {
-   "code": "8936",
-   "name": "國統",
-   "market": "上櫃",
-   "close": 53.1,
-   "chgPct": -0.19,
-   "avgVol": 1045,
-   "volume": 799,
-   "foreignNet": -20,
-   "trustNet": -3,
-   "dealerNet": 185,
-   "instNet": 162,
-   "instHist": [
-    162,
-    205,
-    561,
-    329,
-    -42
-   ],
-   "inst5d": 1214,
-   "foreignStreak": 0,
-   "trustStreak": 0,
-   "marginChg": -128,
-   "marginBal": 7865,
-   "shortChg": 0,
-   "bigPct": 23.18,
-   "bigChg": -0.35,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 21.2,
-    "inst5": 24.8,
-    "streak": 4.5,
-    "margin": 14.2,
-    "big": 8.1,
-    "broker": 0
-   },
-   "score": 72.8,
-   "rank": 14,
-   "tags": [
-    "融資大減",
-    "5日買超>均量"
    ]
   },
   {
@@ -1514,55 +1429,97 @@
    "parts": {
     "inst1": 24.2,
     "inst5": 12.6,
-    "streak": 7.5,
+    "streak": 7.9,
     "margin": 12.3,
     "big": 15.9,
     "broker": 0
    },
-   "score": 72.5,
-   "rank": 15,
+   "score": 72.9,
+   "rank": 13,
    "tags": []
   },
   {
-   "code": "6207",
-   "name": "雷科",
+   "code": "6217",
+   "name": "中探針",
    "market": "上櫃",
-   "close": 147.5,
-   "chgPct": 2.79,
-   "avgVol": 20902,
-   "volume": 11952,
-   "foreignNet": 1061,
+   "close": 173.0,
+   "chgPct": -0.57,
+   "avgVol": 2912,
+   "volume": 2567,
+   "foreignNet": 383,
    "trustNet": 0,
-   "dealerNet": -69,
-   "instNet": 992,
+   "dealerNet": 0,
+   "instNet": 383,
    "instHist": [
-    992,
-    -1124,
-    1238,
-    -2266,
-    1749
+    383,
+    -430,
+    237,
+    464,
+    -54
    ],
-   "inst5d": 590,
+   "inst5d": 600,
    "foreignStreak": 1,
    "trustStreak": 0,
-   "marginChg": -82,
-   "marginBal": 7646,
-   "shortChg": -35,
-   "bigPct": 11.35,
-   "bigChg": 3.49,
+   "marginChg": -579,
+   "marginBal": 13480,
+   "shortChg": 2,
+   "bigPct": 16.16,
+   "bigChg": 0.04,
    "brokerNet": null,
    "parts": {
-    "inst1": 16.4,
-    "inst5": 14.9,
-    "streak": 6.4,
-    "margin": 9.8,
-    "big": 25,
+    "inst1": 20.0,
+    "inst5": 19.2,
+    "streak": 5.8,
+    "margin": 14.5,
+    "big": 13.0,
     "broker": 0
    },
    "score": 72.5,
-   "rank": 16,
+   "rank": 14,
    "tags": [
-    "大戶增持"
+    "融資大減"
+   ]
+  },
+  {
+   "code": "2221",
+   "name": "大甲",
+   "market": "上櫃",
+   "close": 189.5,
+   "chgPct": 1.88,
+   "avgVol": 1031,
+   "volume": 618,
+   "foreignNet": 42,
+   "trustNet": 0,
+   "dealerNet": 10,
+   "instNet": 52,
+   "instHist": [
+    52,
+    136,
+    119,
+    349,
+    -54
+   ],
+   "inst5d": 602,
+   "foreignStreak": 4,
+   "trustStreak": 0,
+   "marginChg": -15,
+   "marginBal": 1476,
+   "shortChg": 1,
+   "bigPct": 64.24,
+   "bigChg": 0.0,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 16.5,
+    "inst5": 23.4,
+    "streak": 9.0,
+    "margin": 10.8,
+    "big": 12.5,
+    "broker": 0
+   },
+   "score": 72.2,
+   "rank": 15,
+   "tags": [
+    "外資連買4日"
    ]
   },
   {
@@ -1596,56 +1553,14 @@
    "parts": {
     "inst1": 23.1,
     "inst5": 21.5,
-    "streak": 5.9,
-    "margin": 9.2,
+    "streak": 5.8,
+    "margin": 9.1,
     "big": 12.5,
     "broker": 0
    },
-   "score": 72.2,
-   "rank": 17,
+   "score": 72.0,
+   "rank": 16,
    "tags": []
-  },
-  {
-   "code": "2221",
-   "name": "大甲",
-   "market": "上櫃",
-   "close": 189.5,
-   "chgPct": 1.88,
-   "avgVol": 1031,
-   "volume": 618,
-   "foreignNet": 42,
-   "trustNet": 0,
-   "dealerNet": 10,
-   "instNet": 52,
-   "instHist": [
-    52,
-    136,
-    119,
-    349,
-    -54
-   ],
-   "inst5d": 602,
-   "foreignStreak": 4,
-   "trustStreak": 0,
-   "marginChg": -15,
-   "marginBal": 1476,
-   "shortChg": 1,
-   "bigPct": 64.24,
-   "bigChg": 0.0,
-   "brokerNet": null,
-   "parts": {
-    "inst1": 16.5,
-    "inst5": 23.4,
-    "streak": 8.9,
-    "margin": 10.8,
-    "big": 12.5,
-    "broker": 0
-   },
-   "score": 72.1,
-   "rank": 18,
-   "tags": [
-    "外資連買4日"
-   ]
   },
   {
    "code": "3162",
@@ -1678,14 +1593,56 @@
    "parts": {
     "inst1": 17.3,
     "inst5": 23.7,
-    "streak": 7.5,
+    "streak": 7.9,
     "margin": 9.6,
     "big": 13.4,
     "broker": 0
    },
-   "score": 71.5,
-   "rank": 19,
+   "score": 71.9,
+   "rank": 17,
    "tags": []
+  },
+  {
+   "code": "6207",
+   "name": "雷科",
+   "market": "上櫃",
+   "close": 147.5,
+   "chgPct": 2.79,
+   "avgVol": 20902,
+   "volume": 11952,
+   "foreignNet": 1061,
+   "trustNet": 0,
+   "dealerNet": -69,
+   "instNet": 992,
+   "instHist": [
+    992,
+    -1124,
+    1238,
+    -2266,
+    1749
+   ],
+   "inst5d": 590,
+   "foreignStreak": 1,
+   "trustStreak": 0,
+   "marginChg": -82,
+   "marginBal": 7646,
+   "shortChg": -35,
+   "bigPct": 11.35,
+   "bigChg": 3.49,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 16.4,
+    "inst5": 14.9,
+    "streak": 5.8,
+    "margin": 9.8,
+    "big": 25,
+    "broker": 0
+   },
+   "score": 71.9,
+   "rank": 18,
+   "tags": [
+    "大戶增持"
+   ]
   },
   {
    "code": "6509",
@@ -1718,14 +1675,57 @@
    "parts": {
     "inst1": 24.7,
     "inst5": 24.5,
-    "streak": 6.7,
+    "streak": 5.8,
     "margin": 1.0,
     "big": 14.6,
     "broker": 0
    },
-   "score": 71.5,
-   "rank": 20,
+   "score": 70.6,
+   "rank": 19,
    "tags": []
+  },
+  {
+   "code": "8936",
+   "name": "國統",
+   "market": "上櫃",
+   "close": 53.1,
+   "chgPct": -0.19,
+   "avgVol": 1045,
+   "volume": 799,
+   "foreignNet": -20,
+   "trustNet": -3,
+   "dealerNet": 185,
+   "instNet": 162,
+   "instHist": [
+    162,
+    205,
+    561,
+    329,
+    -42
+   ],
+   "inst5d": 1214,
+   "foreignStreak": 0,
+   "trustStreak": 0,
+   "marginChg": -128,
+   "marginBal": 7865,
+   "shortChg": 0,
+   "bigPct": 23.18,
+   "bigChg": -0.35,
+   "brokerNet": null,
+   "parts": {
+    "inst1": 21.2,
+    "inst5": 24.8,
+    "streak": 2.2,
+    "margin": 14.2,
+    "big": 8.1,
+    "broker": 0
+   },
+   "score": 70.5,
+   "rank": 20,
+   "tags": [
+    "融資大減",
+    "5日買超>均量"
+   ]
   }
  ]
 }

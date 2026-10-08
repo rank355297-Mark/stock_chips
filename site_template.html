@@ -273,7 +273,9 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
     const d = parseDay(day.date);
     const ub = day.universeByMarket || {};
     const pool = state.market === "全部" ? day.universe : (ub[state.market] ?? day.universe);
-    $("asof").textContent = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} 週${WEEK[d.getDay()]} 盤後・從 ${fmt(pool)} 檔${state.market === "全部" ? "上市櫃" : state.market}股中挑選`;
+    const pending = (day.marginPending || []).filter((m) => state.market === "全部" || m === state.market);
+    $("asof").textContent = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} 週${WEEK[d.getDay()]} 盤後・從 ${fmt(pool)} 檔${state.market === "全部" ? "上市櫃" : state.market}股中挑選`
+      + (pending.length ? `・${pending.join("、")}融資融券尚未公布,分數暫不含融資項目` : "");
     const n = day.picks.filter((p) => state.market === "全部" || p.market === state.market).length;
     $("listTitle").textContent = `${state.market === "全部" ? "上市櫃" : state.market}推薦 ${n} 檔`;
     $("genAt").textContent = `本頁資料更新於 ${DATA.generatedAt},集保股權分散表為 ${day.tdccDate} 當週。`;

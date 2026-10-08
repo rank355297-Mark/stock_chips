@@ -54,8 +54,10 @@ def http_get(url, cache_name=None, sleep=2.5):
 def get_json(url, cache_name):
     text = http_get(url)
     j = json.loads(text)
-    ok = str(j.get("stat", "")).lower() == "ok"
-    if ok:  # 只快取成功的結果,避免把「尚無資料」存起來
+    # 櫃買中心在資料尚未公布時也回 stat=ok,但內容是空表,所以還要確認真的有資料列
+    has_rows = bool(j.get("data")) or any(t.get("data") for t in j.get("tables") or [])
+    ok = str(j.get("stat", "")).lower() == "ok" and has_rows
+    if ok:  # 只快取有資料的結果,避免把「尚無資料」存起來
         with open(os.path.join(CACHE, cache_name), "w", encoding="utf-8") as f:
             f.write(text)
     return j if ok else None
@@ -135,20 +137,25 @@ def tpex_price(d):
 
 
 def margins(d):
-    out = {}
+    """回傳 (融資融券資料, 尚未公布的市場集合)。融資融券約晚上 9 點半才公布。"""
+    out, missing = {}, set()
     j = cached_json(f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?date={d:%Y%m%d}&selectType=ALL&response=json",
                     f"twse_margin_{d:%Y%m%d}.json")
     if j:
         for r in j["tables"][1]["data"]:
             out[r[0].strip()] = {"marginChg": num(r[6]) - num(r[5]), "marginBal": num(r[6]),
                                  "shortChg": num(r[12]) - num(r[11])}
+    else:
+        missing.add("上市")
     j = cached_json(f"https://www.tpex.org.tw/www/zh-tw/margin/balance?date={d:%Y/%m/%d}&response=json",
                     f"tpex_margin_{d:%Y%m%d}.json")
     if j:
         for r in j["tables"][0]["data"]:
             out[r[0].strip()] = {"marginChg": num(r[6]) - num(r[2]), "marginBal": num(r[6]),
                                  "shortChg": num(r[14]) - num(r[10])}
-    return out
+    else:
+        missing.add("上櫃")
+    return out, missing
 
 
 def tdcc_latest():
@@ -213,11 +220,18 @@ def trading_days(end, n):
 
 
 def pct_rank(values):
-    """回傳每個值在清單中的百分位(0~1)。"""
+    """回傳每個值在清單中的百分位(0~1)。同分的股票取平均名次,拿到一樣的百分位。"""
     order = sorted(range(len(values)), key=lambda i: values[i])
     ranks = [0.0] * len(values)
-    for pos, i in enumerate(order):
-        ranks[i] = pos / max(1, len(values) - 1)
+    denom = max(1, len(values) - 1)
+    pos = 0
+    while pos < len(order):
+        end = pos
+        while end + 1 < len(order) and values[order[end + 1]] == values[order[pos]]:
+            end += 1
+        for k in range(pos, end + 1):
+            ranks[order[k]] = (pos + end) / 2 / denom
+        pos = end + 1
     return ranks
 
 
@@ -253,7 +267,9 @@ def main():
         p = dict(tpex_price(d) or {})
         p.update(twse_price(d) or {})
         price.append(p)
-    mg = margins(d0)
+    mg, margin_missing = margins(d0)
+    if margin_missing:
+        print("融資融券尚未公布:", margin_missing, "→ 這一項暫不計分,晚上 9 點半後請重跑")
     tdcc_date, big = tdcc_latest()
     print("集保資料日:", tdcc_date)
 
@@ -295,9 +311,15 @@ def main():
         r5 = pct_rank([x["inst5d"] / (x["avgVol"] * LOOKBACK) for x in grp])
         rs = pct_rank([x["foreignStreak"] + x["trustStreak"] * 1.5 for x in grp])
         rm = pct_rank([-x["marginChg"] / x["avgVol"] for x in grp])
+        # 融資融券尚未公布時,這一項不計分,其他項目依比例放大回滿分 100
+        w = dict(WEIGHTS)
+        if mk in margin_missing:
+            scale = 100 / (100 - w["margin"])
+            w = {k: (0 if k == "margin" else v * scale) for k, v in w.items()}
         for x, a, b, c, e in zip(grp, r1, r5, rs, rm):
-            x["parts"] = {"inst1": round(a * WEIGHTS["inst1"], 1), "inst5": round(b * WEIGHTS["inst5"], 1),
-                          "streak": round(c * WEIGHTS["streak"], 1), "margin": round(e * WEIGHTS["margin"], 1),
+            x["w_big"] = w["big"]
+            x["parts"] = {"inst1": round(a * w["inst1"], 1), "inst5": round(b * w["inst5"], 1),
+                          "streak": round(c * w["streak"], 1), "margin": round(e * w["margin"], 1),
                           "big": 0, "broker": 0}
             x["pre"] = sum(x["parts"].values())
         cands += sorted([x for x in grp if x["instNet"] > 0], key=lambda x: -x["pre"])[:TDCC_CANDIDATES]
@@ -320,7 +342,7 @@ def main():
     # 週增 +1 個百分點以上給滿分,減 1 個百分點以上給 0 分
     for x in cands:
         chg = x["bigChg"] if x["bigChg"] is not None else 0
-        x["parts"]["big"] = round(max(0, min(1, (chg + 1) / 2)) * WEIGHTS["big"], 1)
+        x["parts"]["big"] = round(max(0, min(1, (chg + 1) / 2)) * x.pop("w_big"), 1)
         x["score"] = round(sum(x["parts"].values()), 1)
     picks = []
     for mk in MARKETS:
@@ -351,6 +373,7 @@ def main():
         "tradingDays": [f"{d:%Y-%m-%d}" for d in days],
         "tdccDate": tw(tdcc_date), "tdccPrevDate": tw(prev_date) if prev_date else None,
         "universe": len(rows), "universeByMarket": universe, "topN": TOP_N, "weights": WEIGHTS,
+        "marginPending": sorted(margin_missing),
         "filters": {"minAvgLots": MIN_AVG_LOTS, "minPrice": MIN_PRICE, "lookback": LOOKBACK},
         "picks": picks,
     }

@@ -1,7 +1,7 @@
 """把 out/day_*.json 的推薦結果匯入「每天股票推薦系統」網頁。
 
 用法: python build_site.py
-輸出: ../vibe-site/index.html(可直接雙擊開啟的完整網頁)
+輸出: ../vibe-site/index.html 與 index.html(可直接雙擊開啟的完整網頁;後者是 GitHub Pages 首頁)
       site_publish.html(發布到 Artifact 用的版本,不含 <html>/<head> 外框)
 """
 import glob
@@ -108,9 +108,10 @@ def main():
             '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
             "<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>\n"
             f"</head>\n<body>\n{body}\n</body>\n</html>\n")
-    with open(SITE, "w", encoding="utf-8") as f:
-        f.write(page)
-    print("已匯入", [d["date"] for d in days], "→", os.path.abspath(SITE))
+    for target in (SITE, os.path.join(BASE, "index.html")):  # vibe-site 與本資料夾(GitHub Pages 首頁)
+        with open(target, "w", encoding="utf-8") as f:
+            f.write(page)
+        print("已匯入", [d["date"] for d in days], "→", os.path.abspath(target))
 
 
 if __name__ == "__main__":

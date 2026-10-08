@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<title>每天股票推薦系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  tailwind.config = { theme: { extend: { fontFamily: { sans: ["Inter", "Noto Sans TC", "sans-serif"] } } } };
+</script>
+<style>
+/* 版面:全螢幕影片主視覺(玻璃導覽列、底部標題)→ 今日推薦卡片 → 評分方式與資料來源。單一深色主題。 */
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --ink: #ffffff;
+  --ink-2: #d1d5db;      /* gray-300 */
+  --muted: #9ca3af;      /* gray-400 */
+  --line: rgba(255, 255, 255, 0.2);
+  --up: #ff5a5a;         /* 台股慣例:紅漲 */
+  --down: #34c27a;       /* 綠跌 */
+}
+html { background: var(--bg); scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: 'Inter', 'Noto Sans TC', sans-serif;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+.num { font-variant-numeric: tabular-nums; }
+.up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--ink-2); }
+
+.liquid-glass {
+  background: rgba(0, 0, 0, 0.4);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 20%,
+    rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.1) 80%, rgba(255,255,255,0.3) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 進場動畫 */
+.char { display: inline-block; opacity: 0; transform: translateX(-18px); transition: opacity 500ms ease, transform 500ms ease; }
+.char.on { opacity: 1; transform: translateX(0); }
+.fade { opacity: 0; transition-property: opacity; }
+.fade.on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .char, .fade { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+
+.hero { height: 100svh; min-height: 560px; }
+a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* 推薦卡片 */
+.ring { --p: 80; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: conic-gradient(#ffffff calc(var(--p) * 1%), rgba(255,255,255,0.15) 0); }
+.ring span { width: 44px; height: 44px; border-radius: 50%; background: #0b0b0b; display: grid; place-items: center; font-weight: 600; font-size: 15px; }
+.spark { width: 100%; max-width: 100%; height: auto; display: block; }
+.dates::-webkit-scrollbar { height: 4px; }
+</style>
+
+<!-- ===== 主視覺 ===== -->
+<section id="top" class="hero relative w-full overflow-hidden bg-black">
+  <video class="absolute inset-0 h-full w-full object-cover" autoplay loop muted playsinline
+    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260403_050628_c4e32401-fab4-4a27-b7a8-6e9291cd5959.mp4"></video>
+
+  <div class="relative z-10 flex h-full flex-col">
+    <div class="px-6 md:px-12 lg:px-16 pt-6">
+      <nav class="liquid-glass rounded-xl px-4 py-2 flex items-center justify-between">
+        <a href="#top" class="text-2xl font-semibold tracking-tight">每日選股</a>
+        <div class="hidden md:flex items-center gap-8 text-sm">
+          <a href="#picks" class="transition-colors hover:text-gray-300">今日推薦</a>
+          <a href="#history" class="transition-colors hover:text-gray-300">歷史清單</a>
+          <a href="#method" class="transition-colors hover:text-gray-300">評分方式</a>
+          <a href="#sources" class="transition-colors hover:text-gray-300">資料來源</a>
+        </div>
+        <a href="#picks" class="bg-white text-black px-6 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">看今日推薦</a>
+      </nav>
+    </div>
+
+    <div class="px-6 md:px-12 lg:px-16 flex-1 flex flex-col justify-end pb-12 lg:pb-16">
+      <div class="lg:grid lg:grid-cols-2 lg:items-end">
+        <div>
+          <h1 id="heading" class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal mb-4" style="letter-spacing: -0.04em" aria-label="看懂大戶籌碼,上市櫃各選 20 檔。"></h1>
+          <p class="fade text-base md:text-lg text-gray-300 mb-5" data-delay="800" style="transition-duration: 1000ms">每個交易日盤後比對證交所與櫃買中心資料,依三大法人、千張大戶與融資變化計分,分別推薦上市 20 檔、上櫃 20 檔。</p>
+          <div class="fade flex flex-wrap gap-4" data-delay="1200" style="transition-duration: 1000ms">
+            <a href="#picks" class="bg-white text-black px-8 py-3 rounded-lg font-medium transition-colors hover:bg-gray-100">看今日推薦</a>
+            <a href="#method" class="liquid-glass border border-white/20 text-white px-8 py-3 rounded-lg font-medium transition-colors hover:bg-white hover:text-black">評分方式</a>
+          </div>
+        </div>
+        <div class="fade flex items-end justify-start lg:justify-end mt-8 lg:mt-0" data-delay="1400" style="transition-duration: 1000ms">
+          <div class="liquid-glass border border-white/20 px-6 py-3 rounded-xl">
+            <span class="text-lg md:text-xl lg:text-2xl font-light">法人。大戶。融資。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 今日推薦 ===== -->
+<main id="picks" class="px-6 md:px-12 lg:px-16 py-16 lg:py-24">
+  <div class="mx-auto max-w-6xl grid gap-8">
+    <header class="grid gap-6 lg:grid-cols-2 lg:items-end">
+      <div class="grid gap-2">
+        <p class="text-sm text-gray-400 tracking-wide" id="asof">盤後資料</p>
+        <h2 class="text-3xl md:text-4xl font-normal" style="letter-spacing: -0.03em" id="listTitle">上市推薦 20 檔</h2>
+      </div>
+      <div id="history" class="dates flex gap-2 overflow-x-auto pb-1 lg:justify-end" role="group" aria-label="選擇交易日"></div>
+    </header>
+
+    <section class="grid grid-cols-2 md:grid-cols-4 rounded-xl border border-white/20 overflow-hidden" aria-label="當日摘要">
+      <div class="p-4 md:p-5 grid gap-1 border-white/20"><span class="text-xs text-gray-400">推薦檔數</span><span class="text-2xl num" id="sCount">—</span></div>
+      <div class="p-4 md:p-5 grid gap-1 border-l border-white/20"><span class="text-xs text-gray-400">平均推薦分數</span><span class="text-2xl num" id="sAvg">—</span></div>
+      <div class="p-4 md:p-5 grid gap-1 border-t md:border-t-0 md:border-l border-white/20"><span class="text-xs text-gray-400">上漲 / 下跌</span><span class="text-2xl num" id="sUpDown">—</span></div>
+      <div class="p-4 md:p-5 grid gap-1 border-t border-l md:border-t-0 border-white/20 min-w-0"><span class="text-xs text-gray-400">最多檔的產業</span><span class="text-xl truncate" id="sSector">—</span></div>
+    </section>
+
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div class="liquid-glass border border-white/20 rounded-lg p-1 inline-flex gap-1" role="group" aria-label="市場">
+        <button type="button" id="m-twse" data-market="上市" class="mk px-4 py-1.5 rounded-md text-sm">上市 20</button>
+        <button type="button" id="m-otc" data-market="上櫃" class="mk px-4 py-1.5 rounded-md text-sm">上櫃 20</button>
+        <button type="button" id="m-all" data-market="全部" class="mk px-4 py-1.5 rounded-md text-sm">全部 40</button>
+      </div>
+      <label for="sortBy" class="flex items-center gap-3 text-sm text-gray-300">排序
+        <select id="sortBy" class="bg-black border border-white/20 rounded-lg px-3 py-2 text-sm text-white">
+          <option value="score">推薦分數</option>
+          <option value="chg">漲跌幅</option>
+          <option value="vol">成交量</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="list" class="grid gap-4 md:grid-cols-2"></div>
+  </div>
+</main>
+
+<!-- ===== 評分方式 / 資料來源 ===== -->
+<section class="px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
+  <div class="mx-auto max-w-6xl grid gap-10 lg:grid-cols-2 border-t border-white/20 pt-12">
+    <div id="method" class="grid gap-4 content-start">
+      <h2 class="text-2xl font-normal" style="letter-spacing: -0.03em">評分方式</h2>
+      <table class="w-full text-sm">
+        <tbody class="divide-y divide-white/10">
+          <tr><td class="py-2 text-gray-300">法人當日買超 ÷ 5 日均量</td><td class="py-2 text-right num">25</td></tr>
+          <tr><td class="py-2 text-gray-300">法人 5 日累計買超</td><td class="py-2 text-right num">25</td></tr>
+          <tr><td class="py-2 text-gray-300">外資、投信連續買超天數</td><td class="py-2 text-right num">10</td></tr>
+          <tr><td class="py-2 text-gray-300">千張大戶持股比例週增減</td><td class="py-2 text-right num">25</td></tr>
+          <tr><td class="py-2 text-gray-300">融資餘額減少</td><td class="py-2 text-right num">15</td></tr>
+        </tbody>
+      </table>
+      <p class="text-sm text-gray-400 max-w-prose">上市、上櫃分開計分與排名,各取前 20 名。只計 5 日均量 1,000 張以上、股價 10 元以上的普通股,且當日三大法人須為買超。</p>
+    </div>
+    <div id="sources" class="grid gap-4 content-start">
+      <h2 class="text-2xl font-normal" style="letter-spacing: -0.03em">資料來源</h2>
+      <ul class="grid gap-2 text-sm text-gray-300 list-disc pl-5">
+        <li>臺灣證券交易所:三大法人買賣超、每日收盤行情、融資融券餘額</li>
+        <li>證券櫃檯買賣中心:上櫃三大法人、收盤行情、融資融券</li>
+        <li>臺灣集中保管結算所:集保戶股權分散表(每週)</li>
+      </ul>
+      <p class="text-sm text-gray-400" id="genAt"></p>
+    </div>
+  </div>
+  <p class="mx-auto max-w-6xl mt-12 text-xs text-gray-500">本站整理公開籌碼資料並排序,僅供研究參考,不構成任何投資建議。投資前請自行評估風險。</p>
+</section>
+
+<script>
+(function () {
+  // ---- 進場動畫 ----
+  const H = "看懂大戶籌碼\n上市櫃各選 20 檔。", CHAR_DELAY = 30, START = 200;
+  const lines = H.split("\n");
+  const h1 = document.getElementById("heading");
+  h1.innerHTML = lines.map((line, li) => [...line].map((ch, ci) =>
+    `<span class="char" aria-hidden="true" style="transition-delay:${li * line.length * CHAR_DELAY + ci * CHAR_DELAY}ms">${ch === " " ? " " : ch}</span>`
+  ).join("")).join("<br>");
+  setTimeout(() => h1.querySelectorAll(".char").forEach((c) => c.classList.add("on")), START);
+  document.querySelectorAll(".fade").forEach((el) => setTimeout(() => el.classList.add("on"), +el.dataset.delay));
+
+  // ---- 資料:由 build_site.py 從證交所/櫃買中心/集保盤後資料計算後嵌入 ----
+  const DATA = {"generatedAt": "2026-10-08 15:04", "days": [{"date": "2026-10-07", "seriesDates": ["10/1", "10/2", "10/5", "10/6", "10/7"], "tdccDate": "2026-10-02", "universe": 577, "universeByMarket": {"上市": 417, "上櫃": 160}, "picks": [{"rank": 1, "code": "3035", "name": "智原", "market": "上市", "sector": "半導體", "close": 209.0, "chg": -0.71, "vol": 3131, "score": 88, "series": [213.0, 215.5, 216.0, 210.5, 209.0], "tags": ["外資連買5日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 716 張(外資 +665、投信 +0);外資連買 5 日;近 5 日法人累計 +5,863 張;千張大戶持股 28.79%,較前一週增加 1.95 個百分點;融資減少 158 張。"}, {"rank": 2, "code": "6691", "name": "洋基工程", "market": "上市", "sector": "其他電子", "close": 776.0, "chg": -1.4, "vol": 653, "score": 87, "series": [733.0, 741.0, 794.0, 787.0, 776.0], "tags": ["投信連買5日", "大戶增持", "融資大減"], "reason": "三大法人買超 141 張(外資 +108、投信 +49);投信連買 5 日;近 5 日法人累計 +1,212 張;千張大戶持股 58.09%,較前一週增加 1.02 個百分點;融資減少 83 張。"}, {"rank": 3, "code": "2492", "name": "華新科", "market": "上市", "sector": "電子零組件", "close": 428.0, "chg": 9.88, "vol": 53328, "score": 85, "series": [329.0, 361.5, 368.5, 389.5, 428.0], "tags": ["大戶增持", "融資大減"], "reason": "三大法人買超 12,280 張(外資 +9,935、投信 +2,669);外資連買 2 日;近 5 日法人累計 +39,373 張;千張大戶持股 61.51%,較前一週增加 2.68 個百分點;融資減少 3,340 張。"}, {"rank": 4, "code": "6209", "name": "今國光", "market": "上市", "sector": "光電", "close": 90.9, "chg": 4.12, "vol": 18905, "score": 84, "series": [82.7, 83.9, 87.9, 87.3, 90.9], "tags": ["外資連買5日", "大戶增持"], "reason": "三大法人買超 5,259 張(外資 +5,004、投信 +0);外資連買 5 日;近 5 日法人累計 +10,153 張;千張大戶持股 31.28%,較前一週增加 1.30 個百分點;融資減少 227 張。"}, {"rank": 5, "code": "3055", "name": "蔚華科", "market": "上市", "sector": "電子通路", "close": 223.0, "chg": 4.45, "vol": 1232, "score": 83, "series": [210.0, 216.0, 216.5, 213.5, 223.0], "tags": ["外資連買5日", "融資大減", "5日買超>均量"], "reason": "三大法人買超 542 張(外資 +493、投信 +0);外資連買 5 日;近 5 日法人累計 +1,176 張;千張大戶持股 55.99%,較前一週減少 0.02 個百分點;融資減少 228 張。"}, {"rank": 6, "code": "3702", "name": "大聯大", "market": "上市", "sector": "電子通路", "close": 120.0, "chg": 0.84, "vol": 5168, "score": 83, "series": [119.0, 119.0, 119.0, 119.0, 120.0], "tags": ["外資連買3日", "5日買超>均量"], "reason": "三大法人買超 2,574 張(外資 +2,530、投信 +50);投信連買 2 日;外資連買 3 日;近 5 日法人累計 +9,319 張;千張大戶持股 78.19%,較前一週增加 0.17 個百分點;融資減少 158 張。"}, {"rank": 7, "code": "2404", "name": "漢唐", "market": "上市", "sector": "其他電子", "close": 1330.0, "chg": -0.37, "vol": 750, "score": 83, "series": [1305.0, 1285.0, 1310.0, 1335.0, 1330.0], "tags": ["外資連買5日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 176 張(外資 +164、投信 +45);外資連買 5 日;近 5 日法人累計 +1,697 張;千張大戶持股 41.77%,較前一週增加 0.95 個百分點;融資減少 25 張。"}, {"rank": 8, "code": "1304", "name": "台聚", "market": "上市", "sector": "塑膠", "close": 13.05, "chg": 4.4, "vol": 6143, "score": 82, "series": [12.45, 12.7, 12.6, 12.5, 13.05], "tags": ["外資連買4日", "融資大減", "5日買超>均量"], "reason": "三大法人買超 3,604 張(外資 +3,536、投信 +0);外資連買 4 日;近 5 日法人累計 +5,300 張;千張大戶持股 57.85%,較前一週減少 0.13 個百分點;融資減少 216 張。"}, {"rank": 9, "code": "2412", "name": "中華電", "market": "上市", "sector": "通信網路", "close": 145.5, "chg": 0.0, "vol": 7081, "score": 81, "series": [145.5, 146.0, 145.5, 145.5, 145.5], "tags": ["外資連買5日", "融資大減", "5日買超>均量"], "reason": "三大法人買超 2,361 張(外資 +2,594、投信 -261);外資連買 5 日;近 5 日法人累計 +14,509 張;千張大戶持股 78.00%,較前一週增加 0.01 個百分點;融資減少 1,463 張。"}, {"rank": 10, "code": "1319", "name": "東陽", "market": "上市", "sector": "汽車", "close": 80.0, "chg": 2.43, "vol": 1680, "score": 80, "series": [78.6, 78.1, 77.8, 78.1, 80.0], "tags": ["外資連買5日", "融資大減", "5日買超>均量"], "reason": "三大法人買超 1,022 張(外資 +953、投信 -5);外資連買 5 日;近 5 日法人累計 +2,856 張;千張大戶持股 75.59%,較前一週減少 0.35 個百分點;融資減少 125 張。"}, {"rank": 11, "code": "3661", "name": "世芯-KY", "market": "上市", "sector": "半導體", "close": 4190.0, "chg": 0.24, "vol": 3536, "score": 80, "series": [3765.0, 3810.0, 3950.0, 4180.0, 4190.0], "tags": ["投信連買4日", "外資連買4日", "融資大減"], "reason": "三大法人買超 748 張(外資 +394、投信 +362);投信連買 4 日;外資連買 4 日;近 5 日法人累計 +2,190 張;千張大戶持股 9.76%,較前一週增加 0.03 個百分點;融資減少 196 張。"}, {"rank": 12, "code": "1301", "name": "台塑", "market": "上市", "sector": "塑膠", "close": 75.4, "chg": 9.91, "vol": 117005, "score": 79, "series": [66.8, 68.3, 68.5, 68.6, 75.4], "tags": ["外資連買4日", "5日買超>均量"], "reason": "三大法人買超 47,903 張(外資 +35,668、投信 +10,282);外資連買 4 日;近 5 日法人累計 +64,502 張;千張大戶持股 72.92%,較前一週增加 0.37 個百分點;融資增加 604 張。"}, {"rank": 13, "code": "4904", "name": "遠傳", "market": "上市", "sector": "通信網路", "close": 106.0, "chg": 1.44, "vol": 3773, "score": 79, "series": [105.0, 106.0, 105.5, 104.5, 106.0], "tags": ["外資連買5日", "融資大減"], "reason": "三大法人買超 1,261 張(外資 +931、投信 +233);投信連買 2 日;外資連買 5 日;近 5 日法人累計 +3,231 張;千張大戶持股 90.93%,較前一週減少 0.05 個百分點;融資減少 428 張。"}, {"rank": 14, "code": "1802", "name": "台玻", "market": "上市", "sector": "玻璃陶瓷", "close": 65.7, "chg": 9.87, "vol": 108469, "score": 79, "series": [58.8, 59.5, 59.3, 59.8, 65.7], "tags": ["外資連買4日"], "reason": "三大法人買超 23,444 張(外資 +17,211、投信 +0);外資連買 4 日;近 5 日法人累計 +34,157 張;千張大戶持股 74.50%,較前一週增加 0.13 個百分點;融資減少 710 張。"}, {"rank": 15, "code": "1609", "name": "大亞", "market": "上市", "sector": "電器電纜", "close": 39.0, "chg": 1.69, "vol": 6046, "score": 79, "series": [38.7, 38.55, 38.2, 38.35, 39.0], "tags": ["融資大減"], "reason": "三大法人買超 3,124 張(外資 +3,036、投信 +0);外資連買 2 日;近 5 日法人累計 +3,651 張;千張大戶持股 28.99%,較前一週增加 0.05 個百分點;融資減少 201 張。"}, {"rank": 16, "code": "4142", "name": "國光生", "market": "上市", "sector": "生技醫療", "close": 18.55, "chg": 2.2, "vol": 2377, "score": 78, "series": [18.1, 18.0, 17.9, 18.15, 18.55], "tags": ["外資連買3日", "5日買超>均量"], "reason": "三大法人買超 993 張(外資 +994、投信 +0);外資連買 3 日;近 5 日法人累計 +1,639 張;千張大戶持股 33.54%,較前一週增加 0.02 個百分點;融資減少 9 張。"}, {"rank": 17, "code": "6108", "name": "競國", "market": "上市", "sector": "電子零組件", "close": 25.95, "chg": 0.0, "vol": 3288, "score": 78, "series": [25.0, 25.7, 25.65, 25.4, 25.95], "tags": ["法人買超"], "reason": "三大法人買超 899 張(外資 +900、投信 +0);外資連買 2 日;近 5 日法人累計 +1,902 張;千張大戶持股 48.44%,較前一週增加 0.47 個百分點;融資減少 29 張。"}, {"rank": 18, "code": "2882", "name": "國泰金", "market": "上市", "sector": "金融保險", "close": 113.0, "chg": 0.89, "vol": 21904, "score": 78, "series": [110.5, 111.5, 111.5, 112.0, 113.0], "tags": ["投信連買5日"], "reason": "三大法人買超 9,339 張(外資 +9,200、投信 +95);投信連買 5 日;近 5 日法人累計 +13,875 張;千張大戶持股 83.49%,較前一週減少 0.02 個百分點;融資減少 371 張。"}, {"rank": 19, "code": "2328", "name": "廣宇", "market": "上市", "sector": "電子零組件", "close": 48.2, "chg": 0.21, "vol": 1314, "score": 78, "series": [47.75, 47.95, 48.3, 48.1, 48.2], "tags": ["外資連買5日"], "reason": "三大法人買超 303 張(外資 +303、投信 +0);外資連買 5 日;近 5 日法人累計 +1,456 張;千張大戶持股 38.16%,較前一週增加 0.31 個百分點;融資減少 57 張。"}, {"rank": 20, "code": "1605", "name": "華新", "market": "上市", "sector": "電器電纜", "close": 39.9, "chg": 2.97, "vol": 47345, "score": 77, "series": [38.55, 38.75, 38.4, 38.75, 39.9], "tags": ["外資連買4日", "5日買超>均量"], "reason": "三大法人買超 26,081 張(外資 +22,628、投信 +2,594);外資連買 4 日;近 5 日法人累計 +34,599 張;千張大戶持股 72.99%,較前一週增加 0.29 個百分點;融資增加 506 張。"}, {"rank": 1, "code": "3293", "name": "鈊象", "market": "上櫃", "sector": "文化創意", "close": 780.0, "chg": 0.0, "vol": 544, "score": 85, "series": [814.0, 791.0, 794.0, 780.0, 780.0], "tags": ["外資連買5日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 133 張(外資 +127、投信 +10);投信連買 2 日;外資連買 5 日;近 5 日法人累計 +4,935 張;千張大戶持股 49.08%,較前一週增加 3.13 個百分點;融資增加 5 張。"}, {"rank": 2, "code": "3624", "name": "光頡", "market": "上櫃", "sector": "電子零組件", "close": 159.5, "chg": 10.0, "vol": 29538, "score": 85, "series": [151.0, 148.5, 145.5, 145.0, 159.5], "tags": ["外資連買3日", "大戶增持"], "reason": "三大法人買超 7,913 張(外資 +8,125、投信 -300);外資連買 3 日;近 5 日法人累計 +6,827 張;千張大戶持股 50.69%,較前一週增加 0.55 個百分點;融資減少 740 張。"}, {"rank": 3, "code": "5483", "name": "中美晶", "market": "上櫃", "sector": "半導體", "close": 224.0, "chg": 4.19, "vol": 29082, "score": 84, "series": [211.5, 221.5, 214.5, 215.0, 224.0], "tags": ["投信連買5日"], "reason": "三大法人買超 13,002 張(外資 +12,229、投信 +138);投信連買 5 日;近 5 日法人累計 +8,265 張;千張大戶持股 52.84%,較前一週增加 0.48 個百分點;融資減少 715 張。"}, {"rank": 4, "code": "6122", "name": "擎邦", "market": "上櫃", "sector": "電機機械", "close": 59.9, "chg": 4.9, "vol": 1317, "score": 83, "series": [62.3, 63.9, 61.8, 57.1, 59.9], "tags": ["大戶增持"], "reason": "三大法人買超 141 張(外資 +133、投信 -1);外資連買 2 日;近 5 日法人累計 +1,219 張;千張大戶持股 27.10%,較前一週增加 3.96 個百分點;融資減少 10 張。"}, {"rank": 5, "code": "6199", "name": "天品", "market": "上櫃", "sector": "其他", "close": 139.5, "chg": 2.95, "vol": 6479, "score": 81, "series": [128.0, 132.0, 133.5, 135.5, 139.5], "tags": ["大戶增持"], "reason": "三大法人買超 511 張(外資 +454、投信 +0);外資連買 2 日;近 5 日法人累計 +1,828 張;千張大戶持股 79.54%,較前一週增加 1.73 個百分點;融資減少 7 張。"}, {"rank": 6, "code": "8086", "name": "宏捷科", "market": "上櫃", "sector": "半導體", "close": 140.0, "chg": 9.8, "vol": 19349, "score": 81, "series": [115.0, 120.0, 129.0, 127.5, 140.0], "tags": ["大戶增持"], "reason": "三大法人買超 2,184 張(外資 +1,844、投信 +0);外資連買 2 日;近 5 日法人累計 +2,930 張;千張大戶持股 38.66%,較前一週增加 1.01 個百分點;融資增加 231 張。"}, {"rank": 7, "code": "8040", "name": "九暘", "market": "上櫃", "sector": "半導體", "close": 90.2, "chg": -3.22, "vol": 1799, "score": 80, "series": [95.4, 95.7, 94.0, 93.2, 90.2], "tags": ["外資連買3日", "融資大減"], "reason": "三大法人買超 435 張(外資 +448、投信 +0);外資連買 3 日;近 5 日法人累計 +541 張;千張大戶持股 44.68%,較前一週增加 0.00 個百分點;融資減少 191 張。"}, {"rank": 8, "code": "6147", "name": "頎邦", "market": "上櫃", "sector": "半導體", "close": 231.5, "chg": 6.93, "vol": 78639, "score": 78, "series": [225.5, 223.0, 216.0, 216.5, 231.5], "tags": ["法人買超"], "reason": "三大法人買超 21,931 張(外資 +16,381、投信 +4,718);外資連買 2 日;近 5 日法人累計 +15,524 張;千張大戶持股 60.61%,較前一週減少 0.04 個百分點;融資減少 316 張。"}, {"rank": 9, "code": "5347", "name": "世界", "market": "上櫃", "sector": "半導體", "close": 190.0, "chg": -0.52, "vol": 18327, "score": 78, "series": [184.5, 187.0, 184.0, 191.0, 190.0], "tags": ["投信連買5日", "融資大減"], "reason": "三大法人買超 728 張(外資 +703、投信 +406);投信連買 5 日;外資連買 2 日;近 5 日法人累計 +15,309 張;千張大戶持股 81.63%,較前一週增加 0.20 個百分點;融資減少 1,156 張。"}, {"rank": 10, "code": "8383", "name": "千附", "market": "上櫃", "sector": "半導體", "close": 70.6, "chg": 0.71, "vol": 977, "score": 76, "series": [67.9, 68.4, 69.3, 70.1, 70.6], "tags": ["外資連買4日"], "reason": "三大法人買超 111 張(外資 +115、投信 +0);外資連買 4 日;近 5 日法人累計 +236 張;千張大戶持股 44.13%,較前一週增加 0.22 個百分點;融資減少 45 張。"}, {"rank": 11, "code": "3680", "name": "家登", "market": "上櫃", "sector": "半導體", "close": 567.0, "chg": 0.71, "vol": 909, "score": 76, "series": [551.0, 552.0, 561.0, 563.0, 567.0], "tags": ["外資連買5日"], "reason": "三大法人買超 91 張(外資 +91、投信 +0);外資連買 5 日;近 5 日法人累計 +1,223 張;千張大戶持股 43.98%,較前一週增加 0.08 個百分點;融資減少 24 張。"}, {"rank": 12, "code": "3707", "name": "漢磊", "market": "上櫃", "sector": "半導體", "close": 89.9, "chg": 4.53, "vol": 34346, "score": 74, "series": [77.5, 85.2, 85.3, 86.0, 89.9], "tags": ["外資連買5日"], "reason": "三大法人買超 4,739 張(外資 +4,719、投信 +0);外資連買 5 日;近 5 日法人累計 +20,486 張;千張大戶持股 42.02%,較前一週增加 0.24 個百分點;融資增加 668 張。"}, {"rank": 13, "code": "6217", "name": "中探針", "market": "上櫃", "sector": "電子零組件", "close": 173.0, "chg": -0.57, "vol": 2567, "score": 73, "series": [174.5, 177.5, 178.0, 174.0, 173.0], "tags": ["融資大減"], "reason": "三大法人買超 383 張(外資 +383、投信 +0);近 5 日法人累計 +600 張;千張大戶持股 16.16%,較前一週增加 0.04 個百分點;融資減少 579 張。"}, {"rank": 14, "code": "8936", "name": "國統", "market": "上櫃", "sector": "其他", "close": 53.1, "chg": -0.19, "vol": 799, "score": 73, "series": [52.7, 52.3, 53.1, 53.2, 53.1], "tags": ["融資大減", "5日買超>均量"], "reason": "三大法人買超 162 張(外資 -20、投信 -3);近 5 日法人累計 +1,214 張;千張大戶持股 23.18%,較前一週減少 0.35 個百分點;融資減少 128 張。"}, {"rank": 15, "code": "4123", "name": "晟德", "market": "上櫃", "sector": "生技醫療", "close": 31.1, "chg": 0.97, "vol": 1030, "score": 72, "series": [31.3, 31.2, 30.85, 30.8, 31.1], "tags": ["法人買超"], "reason": "三大法人買超 344 張(外資 +378、投信 +0);外資連買 2 日;近 5 日法人累計 -40 張;千張大戶持股 52.98%,較前一週增加 0.27 個百分點;融資減少 30 張。"}, {"rank": 16, "code": "6207", "name": "雷科", "market": "上櫃", "sector": "電子零組件", "close": 147.5, "chg": 2.79, "vol": 11952, "score": 72, "series": [145.0, 148.0, 152.0, 143.5, 147.5], "tags": ["大戶增持"], "reason": "三大法人買超 992 張(外資 +1,061、投信 +0);近 5 日法人累計 +590 張;千張大戶持股 11.35%,較前一週增加 3.49 個百分點;融資減少 82 張。"}, {"rank": 17, "code": "5475", "name": "德宏", "market": "上櫃", "sector": "電子零組件", "close": 193.0, "chg": 6.63, "vol": 11057, "score": 72, "series": [178.0, 180.5, 184.0, 181.0, 193.0], "tags": ["法人買超"], "reason": "三大法人買超 1,130 張(外資 +1,133、投信 +0);近 5 日法人累計 +1,662 張;千張大戶持股 19.08%,較前一週增加 0.00 個百分點。"}, {"rank": 18, "code": "2221", "name": "大甲", "market": "上櫃", "sector": "其他", "close": 189.5, "chg": 1.88, "vol": 618, "score": 72, "series": [179.0, 188.0, 186.0, 186.0, 189.5], "tags": ["外資連買4日"], "reason": "三大法人買超 52 張(外資 +42、投信 +0);外資連買 4 日;近 5 日法人累計 +602 張;千張大戶持股 64.24%,較前一週增加 0.00 個百分點;融資減少 15 張。"}, {"rank": 19, "code": "3162", "name": "精確", "market": "上櫃", "sector": "電機機械", "close": 83.1, "chg": -1.42, "vol": 1464, "score": 72, "series": [87.5, 89.6, 86.9, 84.3, 83.1], "tags": ["法人買超"], "reason": "三大法人買超 227 張(外資 +232、投信 +0);外資連買 2 日;近 5 日法人累計 +2,565 張;千張大戶持股 55.70%,較前一週增加 0.07 個百分點;融資減少 6 張。"}, {"rank": 20, "code": "6509", "name": "聚和", "market": "上櫃", "sector": "化學", "close": 50.4, "chg": 2.13, "vol": 2331, "score": 72, "series": [48.8, 49.9, 49.9, 49.35, 50.4], "tags": ["法人買超"], "reason": "三大法人買超 674 張(外資 +705、投信 -30);近 5 日法人累計 +1,222 張;千張大戶持股 29.14%,較前一週增加 0.17 個百分點;融資增加 123 張。"}]}, {"date": "2026-10-06", "seriesDates": ["9/30", "10/1", "10/2", "10/5", "10/6"], "tdccDate": "2026-10-02", "universe": 579, "universeByMarket": {"上市": 412, "上櫃": 167}, "picks": [{"rank": 1, "code": "2404", "name": "漢唐", "market": "上市", "sector": "其他電子", "close": 1335.0, "chg": 1.91, "vol": 1586, "score": 90, "series": [1290.0, 1305.0, 1285.0, 1310.0, 1335.0], "tags": ["外資連買4日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 572 張(外資 +645、投信 -33);外資連買 4 日;近 5 日法人累計 +2,649 張;千張大戶持股 41.77%,較前一週增加 0.95 個百分點;融資減少 52 張。"}, {"rank": 2, "code": "3044", "name": "健鼎", "market": "上市", "sector": "電子零組件", "close": 579.0, "chg": 3.95, "vol": 3955, "score": 90, "series": [525.0, 529.0, 542.0, 557.0, 579.0], "tags": ["投信連買3日", "外資連買5日", "大戶增持", "融資大減", "5日買超>均量"], "reason": "三大法人買超 1,188 張(外資 +1,142、投信 +7);投信連買 3 日;外資連買 5 日;近 5 日法人累計 +2,552 張;千張大戶持股 69.74%,較前一週增加 0.51 個百分點;融資減少 175 張。"}, {"rank": 3, "code": "3035", "name": "智原", "market": "上市", "sector": "半導體", "close": 210.5, "chg": -2.55, "vol": 3929, "score": 86, "series": [210.5, 213.0, 215.5, 216.0, 210.5], "tags": ["外資連買5日", "大戶增持"], "reason": "三大法人買超 780 張(外資 +823、投信 +0);外資連買 5 日;近 5 日法人累計 +5,064 張;千張大戶持股 28.79%,較前一週增加 1.95 個百分點;融資減少 50 張。"}, {"rank": 4, "code": "2313", "name": "華通", "market": "上市", "sector": "電子零組件", "close": 252.0, "chg": 1.41, "vol": 97518, "score": 85, "series": [226.5, 224.5, 226.0, 248.5, 252.0], "tags": ["投信連買3日", "外資連買3日", "融資大減"], "reason": "三大法人買超 21,982 張(外資 +18,382、投信 +3,285);投信連買 3 日;外資連買 3 日;近 5 日法人累計 +33,226 張;千張大戶持股 53.64%,較前一週增加 0.17 個百分點;融資減少 1,939 張。"}, {"rank": 5, "code": "6691", "name": "洋基工程", "market": "上市", "sector": "其他電子", "close": 787.0, "chg": -0.88, "vol": 1056, "score": 84, "series": [719.0, 733.0, 741.0, 794.0, 787.0], "tags": ["投信連買5日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 52 張(外資 -7、投信 +79);投信連買 5 日;近 5 日法人累計 +2,135 張;千張大戶持股 58.09%,較前一週增加 1.02 個百分點;融資減少 46 張。"}, {"rank": 6, "code": "2476", "name": "鉅祥", "market": "上市", "sector": "電子零組件", "close": 131.5, "chg": 2.33, "vol": 2587, "score": 84, "series": [123.5, 123.0, 126.0, 128.5, 131.5], "tags": ["外資連買3日", "融資大減", "5日買超>均量"], "reason": "三大法人買超 709 張(外資 +679、投信 +0);外資連買 3 日;近 5 日法人累計 +1,600 張;千張大戶持股 60.72%,較前一週增加 0.05 個百分點;融資減少 183 張。"}, {"rank": 7, "code": "2369", "name": "菱生", "market": "上市", "sector": "半導體", "close": 31.4, "chg": -0.63, "vol": 2594, "score": 81, "series": [32.15, 31.75, 31.95, 31.6, 31.4], "tags": ["大戶增持"], "reason": "三大法人買超 759 張(外資 +745、投信 +0);近 5 日法人累計 +3,590 張;千張大戶持股 25.39%,較前一週增加 0.81 個百分點;融資減少 42 張。"}, {"rank": 8, "code": "3005", "name": "神基", "market": "上市", "sector": "電腦週邊", "close": 118.5, "chg": 1.28, "vol": 2274, "score": 80, "series": [116.5, 117.5, 117.5, 117.0, 118.5], "tags": ["投信連買5日", "融資大減"], "reason": "三大法人買超 1,189 張(外資 +1,140、投信 +5);投信連買 5 日;近 5 日法人累計 +1,264 張;千張大戶持股 68.44%,較前一週減少 0.26 個百分點;融資減少 72 張。"}, {"rank": 9, "code": "2379", "name": "瑞昱", "market": "上市", "sector": "半導體", "close": 755.0, "chg": 0.0, "vol": 1574, "score": 80, "series": [760.0, 762.0, 754.0, 755.0, 755.0], "tags": ["投信連買5日", "5日買超>均量"], "reason": "三大法人買超 566 張(外資 +412、投信 +125);投信連買 5 日;外資連買 2 日;近 5 日法人累計 +2,189 張;千張大戶持股 59.34%,較前一週增加 0.31 個百分點;融資減少 13 張。"}, {"rank": 10, "code": "6196", "name": "帆宣", "market": "上市", "sector": "其他電子", "close": 663.0, "chg": -2.36, "vol": 3307, "score": 80, "series": [585.0, 602.0, 618.0, 679.0, 663.0], "tags": ["外資連買5日", "融資大減"], "reason": "三大法人買超 348 張(外資 +425、投信 +0);外資連買 5 日;近 5 日法人累計 +2,652 張;千張大戶持股 66.07%,較前一週增加 0.21 個百分點;融資減少 224 張。"}, {"rank": 11, "code": "1802", "name": "台玻", "market": "上市", "sector": "玻璃陶瓷", "close": 59.8, "chg": 0.84, "vol": 23902, "score": 80, "series": [59.9, 58.8, 59.5, 59.3, 59.8], "tags": ["外資連買3日"], "reason": "三大法人買超 6,778 張(外資 +5,993、投信 +42);外資連買 3 日;近 5 日法人累計 +16,565 張;千張大戶持股 74.50%,較前一週增加 0.13 個百分點;融資減少 496 張。"}, {"rank": 12, "code": "2412", "name": "中華電", "market": "上市", "sector": "通信網路", "close": 145.5, "chg": 0.0, "vol": 7053, "score": 79, "series": [143.5, 145.5, 146.0, 145.5, 145.5], "tags": ["外資連買5日", "5日買超>均量"], "reason": "三大法人買超 3,064 張(外資 +2,946、投信 +107);外資連買 5 日;近 5 日法人累計 +15,049 張;千張大戶持股 78.00%,較前一週增加 0.01 個百分點;融資減少 70 張。"}, {"rank": 13, "code": "1477", "name": "聚陽", "market": "上市", "sector": "紡織纖維", "close": 203.5, "chg": 3.04, "vol": 2256, "score": 78, "series": [192.0, 190.5, 192.0, 197.5, 203.5], "tags": ["融資大減", "5日買超>均量"], "reason": "三大法人買超 974 張(外資 +998、投信 +47);外資連買 2 日;近 5 日法人累計 +2,086 張;千張大戶持股 50.13%,較前一週減少 0.45 個百分點;融資減少 107 張。"}, {"rank": 14, "code": "7795", "name": "長廣", "market": "上市", "sector": "電子零組件", "close": 555.0, "chg": -0.72, "vol": 1373, "score": 78, "series": [488.0, 536.0, 548.0, 559.0, 555.0], "tags": ["外資連買4日"], "reason": "三大法人買超 415 張(外資 +427、投信 +0);外資連買 4 日;近 5 日法人累計 +1,100 張;千張大戶持股 64.99%,較前一週增加 0.00 個百分點;融資減少 63 張。"}, {"rank": 15, "code": "3019", "name": "亞光", "market": "上市", "sector": "光電", "close": 141.0, "chg": -0.35, "vol": 2614, "score": 77, "series": [136.5, 137.0, 139.0, 141.5, 141.0], "tags": ["外資連買5日", "融資大減", "5日買超>均量"], "reason": "三大法人買超 393 張(外資 +392、投信 +0);外資連買 5 日;近 5 日法人累計 +2,935 張;千張大戶持股 32.57%,較前一週減少 0.12 個百分點;融資減少 158 張。"}, {"rank": 16, "code": "1773", "name": "勝一", "market": "上市", "sector": "化學", "close": 182.0, "chg": 0.83, "vol": 1353, "score": 77, "series": [167.5, 167.5, 170.5, 180.5, 182.0], "tags": ["外資連買3日", "5日買超>均量"], "reason": "三大法人買超 240 張(外資 +247、投信 +0);外資連買 3 日;近 5 日法人累計 +1,997 張;千張大戶持股 68.35%,較前一週增加 0.36 個百分點;融資減少 1 張。"}, {"rank": 17, "code": "2393", "name": "億光", "market": "上市", "sector": "光電", "close": 67.2, "chg": 0.3, "vol": 1757, "score": 77, "series": [64.5, 64.5, 65.4, 67.0, 67.2], "tags": ["外資連買5日", "5日買超>均量"], "reason": "三大法人買超 254 張(外資 +341、投信 -24);外資連買 5 日;近 5 日法人累計 +3,474 張;千張大戶持股 59.28%,較前一週增加 0.01 個百分點;融資減少 51 張。"}, {"rank": 18, "code": "1326", "name": "台化", "market": "上市", "sector": "塑膠", "close": 73.0, "chg": 1.96, "vol": 28012, "score": 76, "series": [69.7, 67.7, 71.7, 71.6, 73.0], "tags": ["5日買超>均量"], "reason": "三大法人買超 13,568 張(外資 +13,371、投信 +0);近 5 日法人累計 +33,472 張;千張大戶持股 80.23%,較前一週增加 0.04 個百分點;融資減少 903 張。"}, {"rank": 19, "code": "2609", "name": "陽明", "market": "上市", "sector": "航運", "close": 59.2, "chg": 0.85, "vol": 14016, "score": 76, "series": [59.4, 58.8, 59.7, 58.7, 59.2], "tags": ["5日買超>均量"], "reason": "三大法人買超 5,304 張(外資 +5,172、投信 -89);近 5 日法人累計 +14,269 張;千張大戶持股 60.30%,較前一週減少 0.03 個百分點;融資減少 480 張。"}, {"rank": 20, "code": "8131", "name": "福懋科", "market": "上市", "sector": "半導體", "close": 63.2, "chg": -0.47, "vol": 1081, "score": 76, "series": [62.6, 62.5, 63.5, 63.5, 63.2], "tags": ["法人買超"], "reason": "三大法人買超 218 張(外資 +209、投信 +1);近 5 日法人累計 +1,711 張;千張大戶持股 68.35%,較前一週增加 0.31 個百分點;融資減少 58 張。"}, {"rank": 1, "code": "3293", "name": "鈊象", "market": "上櫃", "sector": "文化創意", "close": 780.0, "chg": -1.76, "vol": 1389, "score": 93, "series": [788.0, 814.0, 791.0, 794.0, 780.0], "tags": ["外資連買5日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 269 張(外資 +286、投信 +6);外資連買 5 日;近 5 日法人累計 +5,916 張;千張大戶持股 49.08%,較前一週增加 3.13 個百分點;融資減少 52 張。"}, {"rank": 2, "code": "3211", "name": "順達", "market": "上櫃", "sector": "電腦週邊", "close": 395.0, "chg": -1.0, "vol": 12159, "score": 86, "series": [398.5, 394.0, 397.0, 399.0, 395.0], "tags": ["大戶增持", "融資大減"], "reason": "三大法人買超 1,418 張(外資 +1,588、投信 -29);近 5 日法人累計 +1,608 張;千張大戶持股 40.07%,較前一週增加 0.88 個百分點;融資減少 295 張。"}, {"rank": 3, "code": "3630", "name": "新鉅科", "market": "上櫃", "sector": "光電", "close": 29.5, "chg": 8.06, "vol": 3810, "score": 85, "series": [26.95, 26.9, 26.8, 27.3, 29.5], "tags": ["外資連買5日", "融資大減"], "reason": "三大法人買超 613 張(外資 +610、投信 +0);外資連買 5 日;近 5 日法人累計 +1,005 張;千張大戶持股 51.09%,較前一週增加 0.00 個百分點;融資減少 113 張。"}, {"rank": 4, "code": "5347", "name": "世界", "market": "上櫃", "sector": "半導體", "close": 191.0, "chg": 3.8, "vol": 33208, "score": 84, "series": [181.0, 184.5, 187.0, 184.0, 191.0], "tags": ["投信連買5日"], "reason": "三大法人買超 12,874 張(外資 +12,071、投信 +196);投信連買 5 日;近 5 日法人累計 +12,949 張;千張大戶持股 81.63%,較前一週增加 0.20 個百分點;融資減少 397 張。"}, {"rank": 5, "code": "3564", "name": "其陽", "market": "上櫃", "sector": "通信網路", "close": 60.5, "chg": -1.94, "vol": 2752, "score": 83, "series": [50.6, 51.0, 56.1, 61.7, 60.5], "tags": ["外資連買5日", "融資大減"], "reason": "三大法人買超 537 張(外資 +592、投信 +0);外資連買 5 日;近 5 日法人累計 +739 張;千張大戶持股 59.04%,較前一週減少 0.03 個百分點;融資減少 82 張。"}, {"rank": 6, "code": "6122", "name": "擎邦", "market": "上櫃", "sector": "電機機械", "close": 57.1, "chg": -7.61, "vol": 2842, "score": 82, "series": [60.5, 62.3, 63.9, 61.8, 57.1], "tags": ["大戶增持"], "reason": "三大法人買超 276 張(外資 +283、投信 -3);近 5 日法人累計 +1,898 張;千張大戶持股 27.10%,較前一週增加 3.96 個百分點;融資增加 59 張。"}, {"rank": 7, "code": "6199", "name": "天品", "market": "上櫃", "sector": "其他", "close": 135.5, "chg": 1.5, "vol": 5067, "score": 80, "series": [127.5, 128.0, 132.0, 133.5, 135.5], "tags": ["大戶增持"], "reason": "三大法人買超 69 張(外資 +73、投信 +0);近 5 日法人累計 +1,294 張;千張大戶持股 79.54%,較前一週增加 1.73 個百分點;融資減少 308 張。"}, {"rank": 8, "code": "6538", "name": "倉和", "market": "上櫃", "sector": "電子零組件", "close": 302.0, "chg": -9.99, "vol": 1342, "score": 78, "series": [356.0, 369.5, 372.5, 335.5, 302.0], "tags": ["大戶增持", "融資大減"], "reason": "三大法人買超 181 張(外資 +174、投信 +0);近 5 日法人累計 -326 張;千張大戶持股 24.87%,較前一週增加 1.09 個百分點;融資減少 551 張。"}, {"rank": 9, "code": "3491", "name": "昇達科", "market": "上櫃", "sector": "通信網路", "close": 1715.0, "chg": 5.21, "vol": 4238, "score": 76, "series": [1500.0, 1490.0, 1485.0, 1630.0, 1715.0], "tags": ["投信連買3日"], "reason": "三大法人買超 580 張(外資 +392、投信 +140);投信連買 3 日;外資連買 2 日;近 5 日法人累計 +941 張;千張大戶持股 22.99%,較前一週增加 0.33 個百分點;融資增加 104 張。"}, {"rank": 10, "code": "8936", "name": "國統", "market": "上櫃", "sector": "其他", "close": 53.2, "chg": 0.19, "vol": 936, "score": 76, "series": [52.6, 52.7, 52.3, 53.1, 53.2], "tags": ["融資大減", "5日買超>均量"], "reason": "三大法人買超 205 張(外資 -2、投信 +0);近 5 日法人累計 +1,582 張;千張大戶持股 23.18%,較前一週減少 0.35 個百分點;融資減少 153 張。"}, {"rank": 11, "code": "3680", "name": "家登", "market": "上櫃", "sector": "半導體", "close": 563.0, "chg": 0.36, "vol": 2671, "score": 76, "series": [555.0, 551.0, 552.0, 561.0, 563.0], "tags": ["外資連買5日"], "reason": "三大法人買超 377 張(外資 +424、投信 +0);外資連買 5 日;近 5 日法人累計 +1,294 張;千張大戶持股 43.98%,較前一週增加 0.08 個百分點;融資增加 31 張。"}, {"rank": 12, "code": "4760", "name": "勤凱", "market": "上櫃", "sector": "其他電子", "close": 335.0, "chg": -3.87, "vol": 3369, "score": 75, "series": [262.5, 288.5, 317.0, 348.5, 335.0], "tags": ["法人買超"], "reason": "三大法人買超 373 張(外資 +357、投信 +0);近 5 日法人累計 +566 張;千張大戶持股 34.71%,較前一週增加 0.03 個百分點;融資減少 11 張。"}, {"rank": 13, "code": "4716", "name": "大立", "market": "上櫃", "sector": "化學", "close": 20.95, "chg": 9.97, "vol": 1857, "score": 74, "series": [16.85, 17.25, 18.95, 19.05, 20.95], "tags": ["融資大減"], "reason": "三大法人買超 115 張(外資 +108、投信 +0);近 5 日法人累計 +403 張;千張大戶持股 24.35%,較前一週增加 0.23 個百分點;融資減少 280 張。"}, {"rank": 14, "code": "6907", "name": "雅特力-KY", "market": "上櫃", "sector": "半導體", "close": 191.0, "chg": -1.29, "vol": 790, "score": 73, "series": [188.0, 198.5, 200.5, 193.5, 191.0], "tags": ["外資連買3日", "融資大減"], "reason": "三大法人買超 20 張(外資 +60、投信 +0);外資連買 3 日;近 5 日法人累計 +801 張;千張大戶持股 62.26%,較前一週增加 0.00 個百分點;融資減少 149 張。"}, {"rank": 15, "code": "4541", "name": "晟田", "market": "上櫃", "sector": "其他", "close": 60.0, "chg": -1.32, "vol": 446, "score": 73, "series": [61.6, 60.1, 61.1, 60.8, 60.0], "tags": ["外資連買3日", "大戶增持"], "reason": "三大法人買超 24 張(外資 +17、投信 +0);外資連買 3 日;近 5 日法人累計 +189 張;千張大戶持股 28.00%,較前一週增加 1.22 個百分點;融資增加 41 張。"}, {"rank": 16, "code": "2221", "name": "大甲", "market": "上櫃", "sector": "其他", "close": 186.0, "chg": 0.0, "vol": 611, "score": 73, "series": [197.5, 179.0, 188.0, 186.0, 186.0], "tags": ["外資連買3日"], "reason": "三大法人買超 136 張(外資 +61、投信 +0);外資連買 3 日;近 5 日法人累計 +184 張;千張大戶持股 64.24%,較前一週增加 0.00 個百分點;融資減少 69 張。"}, {"rank": 17, "code": "3529", "name": "力旺", "market": "上櫃", "sector": "半導體", "close": 3115.0, "chg": -1.27, "vol": 902, "score": 73, "series": [3305.0, 3245.0, 3170.0, 3155.0, 3115.0], "tags": ["大戶增持"], "reason": "三大法人買超 55 張(外資 +241、投信 -181);外資連買 2 日;近 5 日法人累計 -255 張;千張大戶持股 34.39%,較前一週增加 3.05 個百分點;融資減少 31 張。"}, {"rank": 18, "code": "3675", "name": "德微", "market": "上櫃", "sector": "半導體", "close": 335.5, "chg": -3.87, "vol": 1458, "score": 73, "series": [330.0, 359.0, 360.0, 349.0, 335.5], "tags": ["融資大減"], "reason": "三大法人買超 257 張(外資 +170、投信 +104);近 5 日法人累計 +162 張;千張大戶持股 55.16%,較前一週增加 0.00 個百分點;融資減少 171 張。"}, {"rank": 19, "code": "4123", "name": "晟德", "market": "上櫃", "sector": "生技醫療", "close": 30.8, "chg": -0.16, "vol": 1051, "score": 72, "series": [31.25, 31.3, 31.2, 30.85, 30.8], "tags": ["法人買超"], "reason": "三大法人買超 194 張(外資 +260、投信 +0);近 5 日法人累計 +16 張;千張大戶持股 52.98%,較前一週增加 0.27 個百分點;融資減少 34 張。"}, {"rank": 20, "code": "6274", "name": "台燿", "market": "上櫃", "sector": "電子零組件", "close": 1755.0, "chg": -1.4, "vol": 16845, "score": 72, "series": [1520.0, 1535.0, 1620.0, 1780.0, 1755.0], "tags": ["投信連買3日"], "reason": "三大法人買超 1,075 張(外資 -122、投信 +1,458);投信連買 3 日;近 5 日法人累計 +1,214 張;千張大戶持股 53.49%,較前一週增加 0.09 個百分點;融資減少 130 張。"}]}, {"date": "2026-10-05", "seriesDates": ["9/29", "9/30", "10/1", "10/2", "10/5"], "tdccDate": "2026-10-02", "universe": 572, "universeByMarket": {"上市": 411, "上櫃": 161}, "picks": [{"rank": 1, "code": "3231", "name": "緯創", "market": "上市", "sector": "電腦週邊", "close": 189.5, "chg": 1.61, "vol": 48432, "score": 89, "series": [185.5, 184.5, 190.5, 186.5, 189.5], "tags": ["大戶增持", "融資大減", "5日買超>均量"], "reason": "三大法人買超 25,079 張(外資 +24,878、投信 -181);近 5 日法人累計 +40,560 張;千張大戶持股 66.02%,較前一週增加 0.93 個百分點;融資減少 2,305 張。"}, {"rank": 2, "code": "3035", "name": "智原", "market": "上市", "sector": "半導體", "close": 216.0, "chg": 0.23, "vol": 6548, "score": 89, "series": [210.0, 210.5, 213.0, 215.5, 216.0], "tags": ["外資連買5日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 1,823 張(外資 +1,835、投信 +0);外資連買 5 日;近 5 日法人累計 +5,970 張;千張大戶持股 28.79%,較前一週增加 1.95 個百分點;融資減少 99 張。"}, {"rank": 3, "code": "2344", "name": "華邦電", "market": "上市", "sector": "半導體", "close": 181.0, "chg": 1.12, "vol": 90977, "score": 89, "series": [174.0, 179.5, 180.0, 179.0, 181.0], "tags": ["外資連買5日", "大戶增持", "融資大減", "5日買超>均量"], "reason": "三大法人買超 20,866 張(外資 +22,053、投信 -1,848);外資連買 5 日;近 5 日法人累計 +76,320 張;千張大戶持股 65.01%,較前一週增加 0.71 個百分點;融資減少 5,343 張。"}, {"rank": 4, "code": "4958", "name": "臻鼎-KY", "market": "上市", "sector": "電子零組件", "close": 576.0, "chg": 2.67, "vol": 56787, "score": 85, "series": [498.5, 507.0, 510.0, 561.0, 576.0], "tags": ["外資連買5日", "大戶增持"], "reason": "三大法人買超 7,329 張(外資 +6,264、投信 +1,323);投信連買 2 日;外資連買 5 日;近 5 日法人累計 +39,421 張;千張大戶持股 65.78%,較前一週增加 0.84 個百分點;融資減少 1,372 張。"}, {"rank": 5, "code": "2404", "name": "漢唐", "market": "上市", "sector": "其他電子", "close": 1310.0, "chg": 1.95, "vol": 1939, "score": 85, "series": [1220.0, 1290.0, 1305.0, 1285.0, 1310.0], "tags": ["外資連買3日", "大戶增持"], "reason": "三大法人買超 460 張(外資 +465、投信 -17);外資連買 3 日;近 5 日法人累計 +1,571 張;千張大戶持股 41.77%,較前一週增加 0.95 個百分點;融資減少 119 張。"}, {"rank": 6, "code": "6153", "name": "嘉聯益", "market": "上市", "sector": "電子零組件", "close": 17.85, "chg": -0.56, "vol": 2637, "score": 84, "series": [17.65, 18.2, 17.8, 17.95, 17.85], "tags": ["大戶增持"], "reason": "三大法人買超 885 張(外資 +942、投信 +0);外資連買 2 日;近 5 日法人累計 +2,496 張;千張大戶持股 41.61%,較前一週增加 0.78 個百分點;融資減少 145 張。"}, {"rank": 7, "code": "8070", "name": "長華*", "market": "上市", "sector": "電子通路", "close": 51.7, "chg": 1.97, "vol": 4704, "score": 84, "series": [49.7, 50.2, 50.2, 50.7, 51.7], "tags": ["外資連買5日", "融資大減", "5日買超>均量"], "reason": "三大法人買超 1,340 張(外資 +638、投信 +497);外資連買 5 日;近 5 日法人累計 +2,209 張;千張大戶持股 69.88%,較前一週減少 0.07 個百分點;融資減少 193 張。"}, {"rank": 8, "code": "6691", "name": "洋基工程", "market": "上市", "sector": "其他電子", "close": 794.0, "chg": 7.15, "vol": 2022, "score": 84, "series": [654.0, 719.0, 733.0, 741.0, 794.0], "tags": ["投信連買4日", "外資連買4日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 572 張(外資 +513、投信 +4);投信連買 4 日;外資連買 4 日;近 5 日法人累計 +1,932 張;千張大戶持股 58.09%,較前一週增加 1.02 個百分點;融資增加 91 張。"}, {"rank": 9, "code": "2049", "name": "上銀", "market": "上市", "sector": "電機機械", "close": 345.5, "chg": 3.91, "vol": 4839, "score": 84, "series": [335.5, 335.0, 335.0, 332.5, 345.5], "tags": ["融資大減", "5日買超>均量"], "reason": "三大法人買超 1,805 張(外資 +2,176、投信 -483);近 5 日法人累計 +2,370 張;千張大戶持股 60.19%,較前一週增加 0.37 個百分點;融資減少 177 張。"}, {"rank": 10, "code": "4976", "name": "佳凌", "market": "上市", "sector": "光電", "close": 37.4, "chg": 3.03, "vol": 2705, "score": 82, "series": [35.5, 35.8, 36.05, 36.3, 37.4], "tags": ["融資大減", "5日買超>均量"], "reason": "三大法人買超 865 張(外資 +865、投信 +0);外資連買 2 日;近 5 日法人累計 +1,198 張;千張大戶持股 25.64%,較前一週增加 0.02 個百分點;融資減少 105 張。"}, {"rank": 11, "code": "2376", "name": "技嘉", "market": "上市", "sector": "電腦週邊", "close": 388.5, "chg": 4.02, "vol": 11356, "score": 82, "series": [362.0, 358.5, 368.5, 373.5, 388.5], "tags": ["投信連買3日", "外資連買3日", "融資大減"], "reason": "三大法人買超 3,420 張(外資 +3,144、投信 +203);投信連買 3 日;外資連買 3 日;近 5 日法人累計 +7,292 張;千張大戶持股 66.06%,較前一週增加 0.03 個百分點;融資減少 539 張。"}, {"rank": 12, "code": "4927", "name": "泰鼎-KY", "market": "上市", "sector": "電子零組件", "close": 52.9, "chg": 9.87, "vol": 8516, "score": 82, "series": [43.75, 44.5, 43.8, 48.15, 52.9], "tags": ["外資連買5日", "融資大減"], "reason": "三大法人買超 1,399 張(外資 +1,332、投信 +0);外資連買 5 日;近 5 日法人累計 +4,904 張;千張大戶持股 18.16%,較前一週增加 0.27 個百分點;融資減少 1,205 張。"}, {"rank": 13, "code": "2455", "name": "全新", "market": "上市", "sector": "通信網路", "close": 606.0, "chg": 4.48, "vol": 2369, "score": 82, "series": [543.0, 552.0, 546.0, 580.0, 606.0], "tags": ["外資連買4日", "大戶增持", "融資大減"], "reason": "三大法人買超 370 張(外資 +99、投信 -45);外資連買 4 日;近 5 日法人累計 +1,165 張;千張大戶持股 39.11%,較前一週增加 0.62 個百分點;融資減少 215 張。"}, {"rank": 14, "code": "3019", "name": "亞光", "market": "上市", "sector": "光電", "close": 141.5, "chg": 1.8, "vol": 4708, "score": 81, "series": [135.5, 136.5, 137.0, 139.0, 141.5], "tags": ["外資連買5日", "融資大減", "5日買超>均量"], "reason": "三大法人買超 1,428 張(外資 +1,163、投信 +0);外資連買 5 日;近 5 日法人累計 +3,109 張;千張大戶持股 32.57%,較前一週減少 0.12 個百分點;融資減少 115 張。"}, {"rank": 15, "code": "3044", "name": "健鼎", "market": "上市", "sector": "電子零組件", "close": 557.0, "chg": 2.77, "vol": 3001, "score": 80, "series": [521.0, 525.0, 529.0, 542.0, 557.0], "tags": ["外資連買4日", "大戶增持"], "reason": "三大法人買超 769 張(外資 +604、投信 +62);投信連買 2 日;外資連買 4 日;近 5 日法人累計 +899 張;千張大戶持股 69.74%,較前一週增加 0.51 個百分點;融資減少 64 張。"}, {"rank": 16, "code": "2393", "name": "億光", "market": "上市", "sector": "光電", "close": 67.0, "chg": 2.45, "vol": 3705, "score": 80, "series": [63.6, 64.5, 64.5, 65.4, 67.0], "tags": ["外資連買5日", "5日買超>均量"], "reason": "三大法人買超 1,387 張(外資 +1,636、投信 -262);外資連買 5 日;近 5 日法人累計 +3,426 張;千張大戶持股 59.28%,較前一週增加 0.01 個百分點;融資減少 23 張。"}, {"rank": 17, "code": "2421", "name": "建準", "market": "上市", "sector": "電子零組件", "close": 169.5, "chg": 2.11, "vol": 3627, "score": 79, "series": [163.5, 160.5, 164.0, 166.0, 169.5], "tags": ["外資連買4日", "融資大減"], "reason": "三大法人買超 768 張(外資 +736、投信 +1);投信連買 2 日;外資連買 4 日;近 5 日法人累計 +1,117 張;千張大戶持股 52.56%,較前一週增加 0.24 個百分點;融資減少 116 張。"}, {"rank": 18, "code": "8021", "name": "尖點", "market": "上市", "sector": "其他電子", "close": 560.0, "chg": 1.27, "vol": 12200, "score": 78, "series": [480.0, 486.0, 503.0, 553.0, 560.0], "tags": ["外資連買5日", "融資大減"], "reason": "三大法人買超 1,016 張(外資 +984、投信 +35);投信連買 2 日;外資連買 5 日;近 5 日法人累計 +4,810 張;千張大戶持股 38.26%,較前一週減少 0.12 個百分點;融資減少 430 張。"}, {"rank": 19, "code": "8046", "name": "南電", "market": "上市", "sector": "電子零組件", "close": 1495.0, "chg": 2.4, "vol": 15131, "score": 78, "series": [1270.0, 1340.0, 1420.0, 1460.0, 1495.0], "tags": ["投信連買4日", "外資連買5日", "融資大減"], "reason": "三大法人買超 1,152 張(外資 +387、投信 +884);投信連買 4 日;外資連買 5 日;近 5 日法人累計 +9,134 張;千張大戶持股 80.60%,較前一週增加 0.40 個百分點;融資減少 883 張。"}, {"rank": 20, "code": "2377", "name": "微星", "market": "上市", "sector": "電腦週邊", "close": 155.0, "chg": 0.0, "vol": 7044, "score": 78, "series": [151.0, 151.0, 152.5, 155.0, 155.0], "tags": ["外資連買3日", "5日買超>均量"], "reason": "三大法人買超 2,232 張(外資 +2,081、投信 -21);外資連買 3 日;近 5 日法人累計 +4,385 張;千張大戶持股 61.46%,較前一週減少 0.15 個百分點;融資減少 162 張。"}, {"rank": 1, "code": "3105", "name": "穩懋", "market": "上櫃", "sector": "半導體", "close": 615.0, "chg": 4.06, "vol": 47142, "score": 92, "series": [493.0, 542.0, 538.0, 591.0, 615.0], "tags": ["外資連買4日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 11,577 張(外資 +9,742、投信 +1,023);外資連買 4 日;近 5 日法人累計 +33,561 張;千張大戶持股 53.46%,較前一週增加 3.77 個百分點;融資減少 384 張。"}, {"rank": 2, "code": "3293", "name": "鈊象", "market": "上櫃", "sector": "文化創意", "close": 794.0, "chg": 0.38, "vol": 1230, "score": 90, "series": [779.0, 788.0, 814.0, 791.0, 794.0], "tags": ["外資連買5日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 470 張(外資 +490、投信 -20);外資連買 5 日;近 5 日法人累計 +6,787 張;千張大戶持股 49.08%,較前一週增加 3.13 個百分點;融資減少 19 張。"}, {"rank": 3, "code": "3680", "name": "家登", "market": "上櫃", "sector": "半導體", "close": 561.0, "chg": 1.63, "vol": 1957, "score": 86, "series": [548.0, 555.0, 551.0, 552.0, 561.0], "tags": ["外資連買5日", "融資大減"], "reason": "三大法人買超 660 張(外資 +603、投信 +0);外資連買 5 日;近 5 日法人累計 +1,166 張;千張大戶持股 43.98%,較前一週增加 0.08 個百分點;融資減少 121 張。"}, {"rank": 4, "code": "5230", "name": "雷笛克光學", "market": "上櫃", "sector": "光電", "close": 22.35, "chg": 0.45, "vol": 527, "score": 82, "series": [22.15, 23.35, 22.65, 22.25, 22.35], "tags": ["大戶增持"], "reason": "三大法人買超 21 張(外資 +21、投信 +0);外資連買 2 日;近 5 日法人累計 +224 張;千張大戶持股 12.09%,較前一週增加 1.82 個百分點;融資減少 51 張。"}, {"rank": 5, "code": "6190", "name": "萬泰科", "market": "上櫃", "sector": "通信網路", "close": 77.4, "chg": 9.32, "vol": 8794, "score": 81, "series": [69.3, 70.4, 71.2, 70.8, 77.4], "tags": ["外資連買5日", "大戶增持", "5日買超>均量"], "reason": "三大法人買超 2,509 張(外資 +2,418、投信 +0);外資連買 5 日;近 5 日法人累計 +3,872 張;千張大戶持股 27.04%,較前一週增加 0.74 個百分點;融資增加 985 張。"}, {"rank": 6, "code": "5309", "name": "系統電", "market": "上櫃", "sector": "電子零組件", "close": 67.1, "chg": 2.13, "vol": 13269, "score": 81, "series": [59.1, 62.7, 62.8, 65.7, 67.1], "tags": ["外資連買3日", "大戶增持"], "reason": "三大法人買超 1,496 張(外資 +1,255、投信 -9);外資連買 3 日;近 5 日法人累計 +9,208 張;千張大戶持股 28.55%,較前一週增加 1.59 個百分點;融資增加 481 張。"}, {"rank": 7, "code": "3707", "name": "漢磊", "market": "上櫃", "sector": "半導體", "close": 85.3, "chg": 0.12, "vol": 55680, "score": 80, "series": [72.9, 75.7, 77.5, 85.2, 85.3], "tags": ["外資連買4日"], "reason": "三大法人買超 4,806 張(外資 +4,981、投信 +0);外資連買 4 日;近 5 日法人累計 +16,611 張;千張大戶持股 42.02%,較前一週增加 0.24 個百分點;融資減少 1,561 張。"}, {"rank": 8, "code": "3491", "name": "昇達科", "market": "上櫃", "sector": "通信網路", "close": 1630.0, "chg": 9.76, "vol": 2059, "score": 80, "series": [1510.0, 1500.0, 1490.0, 1485.0, 1630.0], "tags": ["融資大減"], "reason": "三大法人買超 622 張(外資 +513、投信 +117);投信連買 2 日;近 5 日法人累計 +115 張;千張大戶持股 22.99%,較前一週增加 0.33 個百分點;融資減少 58 張。"}, {"rank": 9, "code": "8431", "name": "匯鑽科", "market": "上櫃", "sector": "其他電子", "close": 63.6, "chg": -0.78, "vol": 847, "score": 80, "series": [66.3, 66.8, 64.7, 64.1, 63.6], "tags": ["融資大減"], "reason": "三大法人買超 70 張(外資 +67、投信 +0);外資連買 2 日;近 5 日法人累計 +730 張;千張大戶持股 18.72%,較前一週增加 0.17 個百分點;融資減少 207 張。"}, {"rank": 10, "code": "8936", "name": "國統", "market": "上櫃", "sector": "其他", "close": 53.1, "chg": 1.53, "vol": 1373, "score": 79, "series": [51.9, 52.6, 52.7, 52.3, 53.1], "tags": ["融資大減", "5日買超>均量"], "reason": "三大法人買超 561 張(外資 +341、投信 -3);外資連買 2 日;近 5 日法人累計 +1,276 張;千張大戶持股 23.18%,較前一週減少 0.35 個百分點;融資減少 93 張。"}, {"rank": 11, "code": "4541", "name": "晟田", "market": "上櫃", "sector": "其他", "close": 60.8, "chg": -0.49, "vol": 694, "score": 79, "series": [59.3, 61.6, 60.1, 61.1, 60.8], "tags": ["大戶增持"], "reason": "三大法人買超 12 張(外資 +11、投信 +0);外資連買 2 日;近 5 日法人累計 +249 張;千張大戶持股 28.00%,較前一週增加 1.22 個百分點;融資減少 21 張。"}, {"rank": 12, "code": "6907", "name": "雅特力-KY", "market": "上櫃", "sector": "半導體", "close": 193.5, "chg": -3.49, "vol": 2001, "score": 78, "series": [180.5, 188.0, 198.5, 200.5, 193.5], "tags": ["融資大減"], "reason": "三大法人買超 258 張(外資 +281、投信 +0);外資連買 2 日;近 5 日法人累計 +791 張;千張大戶持股 62.26%,較前一週增加 0.00 個百分點;融資減少 172 張。"}, {"rank": 13, "code": "6217", "name": "中探針", "market": "上櫃", "sector": "電子零組件", "close": 178.0, "chg": 0.28, "vol": 2804, "score": 74, "series": [173.0, 176.5, 174.5, 177.5, 178.0], "tags": ["法人買超"], "reason": "三大法人買超 237 張(外資 +239、投信 +0);外資連買 2 日;近 5 日法人累計 +1,494 張;千張大戶持股 16.16%,較前一週增加 0.04 個百分點;融資減少 68 張。"}, {"rank": 14, "code": "8358", "name": "金居", "market": "上櫃", "sector": "電子零組件", "close": 570.0, "chg": 9.83, "vol": 40410, "score": 73, "series": [498.0, 495.0, 505.0, 519.0, 570.0], "tags": ["外資連買3日"], "reason": "三大法人買超 6,100 張(外資 +5,007、投信 +96);外資連買 3 日;近 5 日法人累計 +2,743 張;千張大戶持股 27.93%,較前一週增加 0.32 個百分點;融資增加 173 張。"}, {"rank": 15, "code": "3374", "name": "精材", "market": "上櫃", "sector": "半導體", "close": 498.5, "chg": 6.63, "vol": 3380, "score": 73, "series": [455.0, 454.5, 456.0, 467.5, 498.5], "tags": ["外資連買5日", "融資大減", "5日買超>均量"], "reason": "三大法人買超 886 張(外資 +201、投信 +0);外資連買 5 日;近 5 日法人累計 +2,024 張;千張大戶持股 62.87%,較前一週減少 1.30 個百分點;融資減少 524 張。"}, {"rank": 16, "code": "6227", "name": "茂綸", "market": "上櫃", "sector": "電子通路", "close": 142.5, "chg": 1.42, "vol": 2902, "score": 73, "series": [136.0, 132.0, 137.0, 140.5, 142.5], "tags": ["法人買超"], "reason": "三大法人買超 569 張(外資 +396、投信 +0);近 5 日法人累計 +404 張;千張大戶持股 67.60%,較前一週增加 0.00 個百分點;融資減少 21 張。"}, {"rank": 17, "code": "3357", "name": "臺慶科", "market": "上櫃", "sector": "電子零組件", "close": 218.0, "chg": 1.16, "vol": 2308, "score": 73, "series": [203.0, 204.5, 212.5, 215.5, 218.0], "tags": ["外資連買4日"], "reason": "三大法人買超 427 張(外資 +387、投信 +0);外資連買 4 日;近 5 日法人累計 +602 張;千張大戶持股 41.44%,較前一週增加 0.00 個百分點;融資增加 20 張。"}, {"rank": 18, "code": "6016", "name": "康和證", "market": "上櫃", "sector": "金融保險", "close": 24.35, "chg": 1.88, "vol": 4937, "score": 72, "series": [23.5, 24.3, 23.7, 23.9, 24.35], "tags": ["法人買超"], "reason": "三大法人買超 1,746 張(外資 +1,746、投信 +0);外資連買 2 日;近 5 日法人累計 +2,900 張;千張大戶持股 44.80%,較前一週減少 0.42 個百分點;融資減少 77 張。"}, {"rank": 19, "code": "6488", "name": "環球晶", "market": "上櫃", "sector": "半導體", "close": 1180.0, "chg": -0.84, "vol": 18256, "score": 72, "series": [945.0, 1035.0, 1085.0, 1190.0, 1180.0], "tags": ["投信連買3日", "大戶增持"], "reason": "三大法人買超 163 張(外資 +444、投信 +248);投信連買 3 日;近 5 日法人累計 +1,472 張;千張大戶持股 74.14%,較前一週增加 3.06 個百分點;融資增加 483 張。"}, {"rank": 20, "code": "3114", "name": "好德", "market": "上櫃", "sector": "電子零組件", "close": 43.6, "chg": 9.96, "vol": 1914, "score": 72, "series": [35.0, 34.6, 36.05, 39.65, 43.6], "tags": ["外資連買3日"], "reason": "三大法人買超 34 張(外資 +14、投信 +0);外資連買 3 日;近 5 日法人累計 +319 張;千張大戶持股 41.90%,較前一週增加 0.33 個百分點;融資減少 96 張。"}]}]};
+  const WEEK = "日一二三四五六";
+  const days = (DATA && DATA.days) || [];
+  const parseDay = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const store = {
+    get(k) { try { return localStorage.getItem("picks-" + k); } catch (_) { return null; } },
+    set(k, v) { try { localStorage.setItem("picks-" + k, v); } catch (_) {} },
+  };
+  const state = { day: days.length ? days[0].date : null, market: store.get("market") || "上市", sort: store.get("sort") || "score" };
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n.toLocaleString("zh-TW");
+  const cls = (n) => (n > 0 ? "up" : n < 0 ? "down" : "flat");
+
+  function spark(raw, labels) {
+    const idx = raw.map((v, i) => i).filter((i) => raw[i] != null);
+    const s = idx.map((i) => raw[i]);
+    labels = idx.map((i) => labels[i]);
+    if (s.length < 2) return "";
+    const W = 200, Hh = 56, P = 6;
+    const min = Math.min(...s), max = Math.max(...s), span = max - min || 1;
+    const x = (i) => P + (i * (W - P * 2)) / (s.length - 1);
+    const y = (v) => Hh - P - ((v - min) / span) * (Hh - P * 2);
+    const pts = s.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+    const color = s[s.length - 1] >= s[0] ? "var(--up)" : "var(--down)";
+    const area = `M${pts[0]} L${pts.join(" L")} L${x(s.length - 1)},${Hh - P} L${x(0)},${Hh - P} Z`;
+    const dots = s.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="${i === s.length - 1 ? 3.5 : 8}" fill="${i === s.length - 1 ? color : "transparent"}"><title>${labels[i]} 收盤 ${v}</title></circle>`).join("");
+    return `<svg class="spark" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="近 5 日收盤走勢">
+      <line stroke="rgba(255,255,255,0.12)" x1="${P}" x2="${W - P}" y1="${y(min)}" y2="${y(min)}"/>
+      <line stroke="rgba(255,255,255,0.12)" x1="${P}" x2="${W - P}" y1="${y(max)}" y2="${y(max)}"/>
+      <path d="${area}" fill="${color}" fill-opacity="0.14"/>
+      <polyline points="${pts.join(" ")}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+      ${dots}</svg>`;
+  }
+
+  function card(p, day) {
+    const vals = p.series.filter((v) => v != null);
+    const top = p.rank <= 3;
+    return `<article class="rounded-xl border ${top ? "border-white/40" : "border-white/15"} bg-white/[0.04] p-5 grid gap-4 min-w-0">
+      <div class="flex items-center gap-3">
+        <span class="w-7 h-7 rounded-full grid place-items-center text-xs num ${top ? "bg-white text-black" : "border border-white/20 text-gray-300"}" title="推薦排名">${p.rank}</span>
+        <div class="min-w-0 flex-1">
+          <div class="text-lg font-medium leading-tight">${p.name}<span class="ml-2 text-sm text-gray-400 num">${p.code}</span></div>
+          <div class="text-xs text-gray-400">${p.market}・${p.sector}</div>
+        </div>
+        <div class="ring" style="--p:${p.score}" title="推薦分數 ${p.score} / 100"><span class="num">${p.score}</span></div>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-5 items-center">
+        <div class="grid gap-1">
+          <span class="text-2xl font-medium num">${fmt(p.close)}</span>
+          <span class="text-sm font-medium num ${cls(p.chg)}">${p.chg > 0 ? "▲" : p.chg < 0 ? "▼" : ""}${Math.abs(p.chg).toFixed(2)}%</span>
+          <span class="text-xs text-gray-400 num">成交 ${fmt(p.vol)} 張</span>
+        </div>
+        <div class="min-w-0 grid gap-1">${spark(p.series, day.seriesDates)}
+          <div class="flex justify-between text-[11px] text-gray-500"><span>近 5 日收盤</span><span class="num">${fmt(Math.min(...vals))} – ${fmt(Math.max(...vals))}</span></div>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">${p.tags.map((t) => `<span class="liquid-glass border border-white/20 rounded-full px-3 py-0.5 text-xs text-gray-200">${t}</span>`).join("")}</div>
+      <p class="text-sm text-gray-300 leading-relaxed">${p.reason}</p>
+    </article>`;
+  }
+
+  function render() {
+    if (!days.length) {
+      $("list").innerHTML = `<div class="md:col-span-2 rounded-xl border border-dashed border-white/20 p-10 text-center text-gray-300">還沒有匯入推薦資料。請執行 build_site.py 產生網頁。</div>`;
+      return;
+    }
+    const day = days.find((d) => d.date === state.day) || days[0];
+    $("history").innerHTML = days.map((dd) => {
+      const d = parseDay(dd.date), on = dd.date === day.date;
+      return `<button type="button" id="d-${dd.date}" data-day="${dd.date}" aria-pressed="${on}"
+        class="flex-none grid justify-items-center min-w-[68px] px-3 py-2 rounded-lg text-sm transition-colors ${on ? "bg-white text-black" : "liquid-glass border border-white/20 text-gray-300 hover:text-white"}">
+        <span class="font-medium num">${d.getMonth() + 1}/${d.getDate()}</span><span class="text-[11px] ${on ? "text-gray-600" : "text-gray-400"}">週${WEEK[d.getDay()]}</span></button>`;
+    }).join("");
+    document.querySelectorAll(".mk").forEach((b) => {
+      const on = b.dataset.market === state.market;
+      b.setAttribute("aria-pressed", on);
+      b.className = `mk px-4 py-1.5 rounded-md text-sm transition-colors ${on ? "bg-white text-black" : "text-gray-300 hover:text-white"}`;
+    });
+    $("sortBy").value = state.sort;
+    const d = parseDay(day.date);
+    const ub = day.universeByMarket || {};
+    const pool = state.market === "全部" ? day.universe : (ub[state.market] ?? day.universe);
+    $("asof").textContent = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} 週${WEEK[d.getDay()]} 盤後・從 ${fmt(pool)} 檔${state.market === "全部" ? "上市櫃" : state.market}股中挑選`;
+    const n = day.picks.filter((p) => state.market === "全部" || p.market === state.market).length;
+    $("listTitle").textContent = `${state.market === "全部" ? "上市櫃" : state.market}推薦 ${n} 檔`;
+    $("genAt").textContent = `本頁資料更新於 ${DATA.generatedAt},集保股權分散表為 ${day.tdccDate} 當週。`;
+
+    let rows = day.picks.filter((p) => state.market === "全部" || p.market === state.market);
+    const key = { score: (p) => p.score, chg: (p) => p.chg, vol: (p) => p.vol }[state.sort];
+    rows = rows.slice().sort((a, b) => key(b) - key(a));
+
+    $("sCount").textContent = rows.length;
+    $("sAvg").textContent = rows.length ? (rows.reduce((s, p) => s + p.score, 0) / rows.length).toFixed(1) : "—";
+    const up = rows.filter((p) => p.chg > 0).length, down = rows.filter((p) => p.chg < 0).length;
+    $("sUpDown").innerHTML = `<span class="up">${up}</span> / <span class="down">${down}</span>`;
+    const sec = {};
+    rows.forEach((p) => (sec[p.sector] = (sec[p.sector] || 0) + 1));
+    const topSec = Object.entries(sec).sort((a, b) => b[1] - a[1])[0];
+    $("sSector").textContent = topSec ? `${topSec[0]}(${topSec[1]} 檔)` : "—";
+
+    $("list").innerHTML = rows.length ? rows.map((p) => card(p, day)).join("")
+      : `<div class="md:col-span-2 rounded-xl border border-dashed border-white/20 p-10 text-center text-gray-300">這一天沒有${state.market}的推薦股,換個市場看看。</div>`;
+  }
+
+  $("history").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-day]");
+    if (b) { state.day = b.dataset.day; render(); }
+  });
+  document.querySelectorAll(".mk").forEach((b) => b.addEventListener("click", () => {
+    state.market = b.dataset.market; store.set("market", state.market); render();
+  }));
+  $("sortBy").addEventListener("change", (e) => { state.sort = e.target.value; store.set("sort", state.sort); render(); });
+
+  render();
+})();
+</script>
+
+</body>
+</html>

@@ -9,6 +9,7 @@
 | `fetch_chips.py` | 抓取三大法人、收盤行情、融資融券、集保大戶資料並計算分數,輸出 `out/day_YYYY-MM-DD.json` |
 | `build_site.py` | 把 `out/` 的推薦結果嵌入 `site_template.html`,產生 `../vibe-site/index.html` |
 | `export_twse_day.py` | 把證交所某一天的盤後資料存成 CSV,並印出大盤與法人摘要 |
+| `index.html` | `build_site.py` 產生的推薦網頁(GitHub Pages 首頁) |
 | `site_template.html` | 推薦網頁的模板(`site_template_v1.html` 為舊版) |
 | `chips_radar.html` | 「籌碼雷達」網頁 |
 | `out/` | 每日推薦結果 |

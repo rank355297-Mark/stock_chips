@@ -1,0 +1,333 @@
+<title>籌碼雷達</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* 版面:窄欄看盤單 — 頂部日期軸,下方十列推薦股,每列「排名|個股|分數|籌碼四格」;手機改為堆疊卡 */
+:root {
+  --bg: #f1f4f8;
+  --surface: #ffffff;
+  --ink: #121a26;
+  --ink-2: #4b5567;
+  --muted: #7f8899;
+  --line: #dde2ea;
+  --accent: #24427a;
+  --accent-wash: #e4ebf7;
+  --up: #cf2f2f;      /* 台股慣例:紅漲 / 買超 */
+  --down: #12824a;    /* 綠跌 / 賣超 */
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
+  --track: #e8ebf0;
+  --font-body: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+  --font-num: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1219; --surface: #151c27; --ink: #edf1f7; --ink-2: #b2bccb; --muted: #7c8697;
+    --line: #253041; --accent: #93b3ec; --accent-wash: #1d2a40; --up: #ff5d5d; --down: #2fbf74;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --track: #222c3a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1219; --surface: #151c27; --ink: #edf1f7; --ink-2: #b2bccb; --muted: #7c8697;
+  --line: #253041; --accent: #93b3ec; --accent-wash: #1d2a40; --up: #ff5d5d; --down: #2fbf74;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --track: #222c3a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 28px 56px; display: grid; gap: 24px; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--ink-2); }
+
+/* 頁首 */
+header { display: grid; gap: 14px; }
+.brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+h1 { margin: 0; font-size: clamp(28px, 5vw, 40px); font-weight: 900; letter-spacing: 0.04em; text-wrap: balance; }
+h1 .tick { color: var(--up); }
+.sub { color: var(--ink-2); font-size: 14px; }
+.dates { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.dates button {
+  flex: none; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
+  font: 600 13px/1 var(--font-num); padding: 9px 12px; border-radius: 999px; cursor: pointer;
+}
+.dates button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.dates button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 13px; color: var(--ink-2); }
+.meta b { color: var(--ink); font-weight: 600; }
+
+/* 圖例 */
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--ink-2); align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+
+/* 推薦列 */
+.board { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.head, .pick { display: grid; grid-template-columns: 44px minmax(150px, 1.25fr) minmax(160px, 1.1fr) repeat(4, minmax(92px, 1fr)); gap: 0 16px; align-items: center; padding: 14px 18px; }
+.head { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; border-bottom: 1px solid var(--line); padding-block: 10px; }
+.pick { border-bottom: 1px solid var(--line); }
+.pick:last-child { border-bottom: 0; }
+.rank { font: 600 22px/1 var(--font-num); color: var(--muted); }
+.pick:nth-child(-n+4) .rank { color: var(--accent); }
+.stock { min-width: 0; display: grid; gap: 4px; }
+.stock .name { font-weight: 700; font-size: 16.5px; }
+.stock .name .code { font: 500 13px var(--font-num); color: var(--ink-2); margin-left: 6px; }
+.mkt { font-size: 11px; color: var(--ink-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; margin-left: 6px; vertical-align: 2px; }
+.price { font-size: 13px; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.tag { font-size: 11.5px; padding: 1px 7px; border-radius: 4px; background: var(--accent-wash); color: var(--accent); white-space: nowrap; }
+
+.score { display: grid; gap: 6px; min-width: 0; }
+.score .val { font: 600 20px/1 var(--font-num); }
+.score .val small { font-size: 12px; color: var(--muted); font-weight: 500; }
+.bar { display: flex; height: 10px; border-radius: 4px; background: var(--track); overflow: hidden; gap: 2px; }
+.bar i { display: block; height: 100%; }
+.bar i:hover { filter: brightness(1.12); }
+
+.cell { display: grid; gap: 2px; min-width: 0; font-size: 13px; }
+.cell .big { font: 600 15px/1.3 var(--font-num); }
+.cell .small { color: var(--ink-2); font-size: 12px; font-family: var(--font-num); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cell .lbl { display: none; color: var(--muted); font-size: 11.5px; letter-spacing: 0.04em; }
+.spark { display: flex; align-items: center; gap: 3px; height: 30px; }
+.spark .col { position: relative; width: 12px; height: 100%; }
+.spark .col::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--line); }
+.spark .col b { position: absolute; left: 1px; right: 1px; display: block; border-radius: 2px; }
+.spark .col b.pos { background: var(--up); bottom: 50%; }
+.spark .col b.neg { background: var(--down); top: 50%; }
+.spark .col:last-child b { left: 0; right: 0; }
+
+details.why { grid-column: 2 / -1; margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+details.why summary { cursor: pointer; color: var(--accent); font-size: 12.5px; width: max-content; }
+.parts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 4px 18px; margin-top: 8px; }
+.parts div { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px dashed var(--line); padding-block: 3px; }
+.parts div span:first-child { display: inline-flex; gap: 6px; align-items: center; }
+.parts i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+
+.empty { padding: 48px 20px; text-align: center; color: var(--ink-2); display: grid; gap: 8px; justify-items: center; }
+.empty strong { color: var(--ink); font-size: 17px; }
+
+/* 方法說明 */
+.method { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.method section { min-width: 0; }
+.method h2 { font-size: 15px; margin: 0 0 8px; letter-spacing: 0.04em; }
+.method p, .method li { color: var(--ink-2); font-size: 13.5px; max-width: 62ch; }
+.method ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.wtable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.wtable td { padding: 5px 0; border-bottom: 1px solid var(--line); color: var(--ink-2); }
+.wtable td:last-child { text-align: right; font-family: var(--font-num); color: var(--ink); }
+.wtable tr.off td { color: var(--muted); }
+.disclaimer { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+
+#tip { position: fixed; z-index: 10; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 12px; padding: 6px 9px; border-radius: 6px; max-width: 240px; line-height: 1.45; }
+
+@media (max-width: 860px) {
+  .head { display: none; }
+  .pick { grid-template-columns: 36px 1fr 1fr; gap: 12px 14px; align-items: start; padding: 16px; }
+  .rank { grid-row: span 2; padding-top: 2px; }
+  .stock { grid-column: 2 / -1; }
+  .score { grid-column: 2 / -1; }
+  .cell { grid-column: auto; }
+  .pick .cell:nth-of-type(odd) { grid-column: 2; }
+  .cell .lbl { display: block; }
+  details.why { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bar i { transition: filter .15s; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1>籌碼雷達<span class="tick">.</span></h1>
+      <span class="sub">台股上市櫃・每日大戶籌碼前 10 名</span>
+    </div>
+    <div class="dates" id="dates" role="group" aria-label="選擇交易日"></div>
+    <div class="meta" id="meta"></div>
+    <div class="legend" aria-label="分數組成圖例">
+      <span><i style="background:var(--s1)"></i>法人當日買超</span>
+      <span><i style="background:var(--s2)"></i>法人 5 日累計</span>
+      <span><i style="background:var(--s3)"></i>外資/投信連買</span>
+      <span><i style="background:var(--s4)"></i>千張大戶週增減</span>
+      <span><i style="background:var(--s5)"></i>融資減少</span>
+    </div>
+  </header>
+
+  <div class="board" id="board">
+    <div class="head" aria-hidden="true">
+      <span>排名</span><span>個股</span><span>籌碼分數</span><span>三大法人(張)</span><span>法人 5 日</span><span>千張大戶</span><span>融資增減</span>
+    </div>
+    <div id="rows">
+      <div class="empty" id="empty">
+        <strong>正在載入推薦清單</strong>
+        <span>每天盤後由 Claude 抓取證交所、櫃買中心與集保資料計算後寫入。</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="method">
+    <section>
+      <h2>評分方式</h2>
+      <table class="wtable" id="weights"><tbody>
+        <tr><td>法人當日買超 ÷ 5 日均量</td><td>25</td></tr>
+        <tr><td>法人 5 日累計買超 ÷ 5 日總量</td><td>25</td></tr>
+        <tr><td>外資、投信連續買超天數(投信加權 1.5 倍)</td><td>10</td></tr>
+        <tr><td>千張大戶持股比例週增減</td><td>25</td></tr>
+        <tr><td>融資餘額減少 ÷ 均量</td><td>15</td></tr>
+        <tr class="off"><td>主力分點買賣超(尚無資料源)</td><td>0</td></tr>
+      </tbody></table>
+      <p>千張大戶以外的指標,都換算成全體候選股中的百分位再乘上權重。千張大戶週增 1 個百分點以上給滿分,減 1 個百分點以上給 0 分。</p>
+    </section>
+    <section>
+      <h2>篩選條件</h2>
+      <ul>
+        <li>只看普通股(4 碼代號),排除 ETF、權證與特別股。</li>
+        <li>排除小型股:5 日均量低於 1,000 張或股價低於 10 元的不列入。</li>
+        <li>當日三大法人須為買超,先取前 40 名再查集保週變化,最後排出前 10 名。</li>
+      </ul>
+    </section>
+    <section>
+      <h2>資料來源</h2>
+      <ul>
+        <li>證交所:三大法人買賣超日報(T86)、每日收盤行情、融資融券餘額。</li>
+        <li>櫃買中心:三大法人買賣明細、上櫃收盤行情、融資融券餘額。</li>
+        <li>集保結算所:集保戶股權分散表(每週五資料,下週公布)。</li>
+        <li>主力分點:證交所買賣日報表需輸入驗證碼,目前沒有可自動取得的公開來源,權重暫設 0。</li>
+      </ul>
+    </section>
+  </div>
+  <p class="disclaimer">本頁為公開籌碼資料的整理與排序,僅供研究參考,不構成任何投資建議。籌碼面只是判斷依據之一,下單前請自行評估基本面、技術面與風險。</p>
+</div>
+<div id="tip" hidden></div>
+
+<script>
+(function () {
+  const PARTS = [
+    ["inst1", "法人當日買超", "--s1"], ["inst5", "法人 5 日累計", "--s2"], ["streak", "外資/投信連買", "--s3"],
+    ["big", "千張大戶週增減", "--s4"], ["margin", "融資減少", "--s5"],
+  ];
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => (n == null ? "—" : Math.round(n).toLocaleString("zh-TW"));
+  const sgn = (n) => (n > 0 ? "+" : "") + fmt(n);
+  const cls = (n) => (n > 0 ? "up" : n < 0 ? "down" : "flat");
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  let days = [], selected = null;
+
+  function render() {
+    const doc = days.find((d) => d.date === selected) || days[0];
+    const dates = $("dates");
+    dates.innerHTML = days.map((d) =>
+      `<button type="button" id="d-${d.date}" aria-pressed="${d === doc}" data-date="${d.date}">${d.date.slice(5).replace("-", "/")}</button>`).join("");
+    if (!doc) return;
+    $("meta").innerHTML =
+      `<span>交易日 <b class="num">${esc(doc.date)}</b></span>` +
+      `<span>集保週資料 <b class="num">${esc(doc.tdccDate || "—")}</b>${doc.tdccPrevDate ? ` 對比 <b class="num">${esc(doc.tdccPrevDate)}</b>` : ""}</span>` +
+      `<span>符合條件 <b class="num">${fmt(doc.universe)}</b> 檔</span>` +
+      `<span>更新 <b class="num">${esc((doc.generatedAt || "").replace("T", " ").slice(0, 16))}</b></span>`;
+    const picks = doc.picks || [];
+    if (!picks.length) {
+      $("rows").innerHTML = `<div class="empty"><strong>這一天沒有符合條件的股票</strong></div>`;
+      return;
+    }
+    window.__days = doc.tradingDays || [];
+    $("rows").innerHTML = picks.map(row).join("");
+  }
+
+  function row(p) {
+    const parts = p.parts || {};
+    const bar = PARTS.map(([k, label, c]) => {
+      const v = parts[k] || 0;
+      return v > 0 ? `<i style="width:${v}%;background:var(${c})" data-tip="${label}:${v.toFixed(1)} 分"></i>` : "";
+    }).join("");
+    const hist = (p.instHist || []).slice().reverse(); // 舊 → 新
+    const max = Math.max(1, ...hist.map(Math.abs));
+    const days = (window.__days || []);
+    const spark = hist.map((v, i) => {
+      const h = Math.max(2, Math.abs(v) / max * 50);
+      return `<span class="col" data-tip="${esc(days[hist.length - 1 - i] || "")} 法人 ${sgn(v)} 張"><b class="${v >= 0 ? "pos" : "neg"}" style="height:${h}%"></b></span>`;
+    }).join("");
+    const chg = p.chgPct || 0;
+    const bigChg = p.bigChg == null ? `<span class="flat">週變化無資料</span>` :
+      `<span class="${cls(p.bigChg)}">週 ${p.bigChg > 0 ? "+" : ""}${p.bigChg.toFixed(2)} 個百分點</span>`;
+    const tags = (p.tags || []).map((t) => `<span class="tag">${esc(t)}</span>`).join("");
+    const partRows = PARTS.map(([k, label, c]) =>
+      `<div><span><i style="background:var(${c})"></i>${label}</span><span class="num">${(parts[k] || 0).toFixed(1)}</span></div>`).join("");
+    return `<article class="pick">
+      <span class="rank">${p.rank}</span>
+      <div class="stock">
+        <div class="name">${esc(p.name)}<span class="code">${esc(p.code)}</span><span class="mkt">${esc(p.market)}</span></div>
+        <div class="price num">收 ${p.close} <span class="${cls(chg)}">${chg > 0 ? "▲" : chg < 0 ? "▼" : ""}${Math.abs(chg).toFixed(2)}%</span>
+          <span class="flat">・均量 ${fmt(p.avgVol)} 張</span></div>
+        ${tags ? `<div class="tags">${tags}</div>` : ""}
+      </div>
+      <div class="score">
+        <span class="val num">${p.score.toFixed(1)} <small>/ 100</small></span>
+        <div class="bar" role="img" aria-label="籌碼分數 ${p.score.toFixed(1)} 分">${bar}</div>
+      </div>
+      <div class="cell"><span class="lbl">三大法人(張)</span>
+        <span class="big ${cls(p.instNet)}">${sgn(p.instNet)}</span>
+        <span class="small" title="外資 ${sgn(p.foreignNet)}/投信 ${sgn(p.trustNet)}/自營 ${sgn(p.dealerNet)}">外 ${sgn(p.foreignNet)}・投 ${sgn(p.trustNet)}・自 ${sgn(p.dealerNet)}</span>
+      </div>
+      <div class="cell"><span class="lbl">法人 5 日</span>
+        <span class="spark" aria-label="近 5 日法人買賣超">${spark}</span>
+        <span class="small ${cls(p.inst5d)}">合計 ${sgn(p.inst5d)}</span>
+      </div>
+      <div class="cell"><span class="lbl">千張大戶</span>
+        <span class="big">${p.bigPct == null ? "—" : p.bigPct.toFixed(2) + "%"}</span>
+        <span class="small">${bigChg}</span>
+      </div>
+      <div class="cell"><span class="lbl">融資增減</span>
+        <span class="big">${sgn(p.marginChg)}</span>
+        <span class="small">餘額 ${fmt(p.marginBal)}・券 ${sgn(p.shortChg)}</span>
+      </div>
+      <details class="why"><summary>分數明細</summary><div class="parts">${partRows}
+        <div><span>主力分點(未納入)</span><span class="num">—</span></div></div></details>
+    </article>`;
+  }
+
+  $("dates").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-date]");
+    if (!b) return;
+    selected = b.dataset.date;
+    try { sessionStorage.setItem("chips-date", selected); } catch (_) {}
+    render();
+  });
+
+  // 懸停提示
+  const tip = $("tip");
+  document.addEventListener("pointermove", (e) => {
+    const t = e.target.closest("[data-tip]");
+    if (!t) { tip.hidden = true; return; }
+    tip.textContent = t.dataset.tip;
+    tip.hidden = false;
+    const x = Math.min(e.clientX + 12, window.innerWidth - tip.offsetWidth - 8);
+    tip.style.left = x + "px";
+    tip.style.top = (e.clientY + 16) + "px";
+  });
+  document.addEventListener("pointerleave", () => { tip.hidden = true; });
+
+  function showEmpty(title, text) {
+    $("rows").innerHTML = `<div class="empty"><strong>${title}</strong><span>${text}</span></div>`;
+  }
+
+  async function start() {
+    try { selected = sessionStorage.getItem("chips-date"); } catch (_) {}
+    const db = await (window.claude ? window.claude.use("db") : null);
+    if (!db) {
+      showEmpty("目前無法讀取推薦資料", "請登入 claude.ai 後重新開啟此頁面。");
+      return;
+    }
+    db.collection("days").orderBy("date", "desc").limit(30).onSnapshot((snap) => {
+      days = snap.docs.map((d) => d.data());
+      if (!days.length) {
+        showEmpty("還沒有推薦清單", "第一筆資料會在盤後由 Claude 計算並寫入,寫入後這裡會自動更新。");
+        return;
+      }
+      if (!days.some((d) => d.date === selected)) selected = days[0].date;
+      render();
+    }, () => showEmpty("資料連線中斷", "請重新整理頁面。"));
+  }
+  start();
+})();
+</script>

@@ -1,0 +1,309 @@
+<title>每天股票推薦系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  tailwind.config = { theme: { extend: { fontFamily: { sans: ["Inter", "Noto Sans TC", "sans-serif"] } } } };
+</script>
+<style>
+/* 版面:全螢幕影片主視覺(玻璃導覽列、底部標題)→ 今日推薦卡片 → 評分方式與資料來源。單一深色主題。 */
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --ink: #ffffff;
+  --ink-2: #d1d5db;      /* gray-300 */
+  --muted: #9ca3af;      /* gray-400 */
+  --line: rgba(255, 255, 255, 0.2);
+  --up: #ff5a5a;         /* 台股慣例:紅漲 */
+  --down: #34c27a;       /* 綠跌 */
+}
+html { background: var(--bg); scroll-behavior: smooth; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: 'Inter', 'Noto Sans TC', sans-serif;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+}
+.num { font-variant-numeric: tabular-nums; }
+.up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--ink-2); }
+
+.liquid-glass {
+  background: rgba(0, 0, 0, 0.4);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg,
+    rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 20%,
+    rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%,
+    rgba(255,255,255,0.1) 80%, rgba(255,255,255,0.3) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 進場動畫 */
+.char { display: inline-block; opacity: 0; transform: translateX(-18px); transition: opacity 500ms ease, transform 500ms ease; }
+.char.on { opacity: 1; transform: translateX(0); }
+.fade { opacity: 0; transition-property: opacity; }
+.fade.on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .char, .fade { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+
+.hero { height: 100svh; min-height: 560px; }
+a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* 推薦卡片 */
+.ring { --p: 80; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: conic-gradient(#ffffff calc(var(--p) * 1%), rgba(255,255,255,0.15) 0); }
+.ring span { width: 44px; height: 44px; border-radius: 50%; background: #0b0b0b; display: grid; place-items: center; font-weight: 600; font-size: 15px; }
+.spark { width: 100%; max-width: 100%; height: auto; display: block; }
+.dates::-webkit-scrollbar { height: 4px; }
+</style>
+
+<!-- ===== 主視覺 ===== -->
+<section id="top" class="hero relative w-full overflow-hidden bg-black">
+  <video class="absolute inset-0 h-full w-full object-cover" autoplay loop muted playsinline
+    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260403_050628_c4e32401-fab4-4a27-b7a8-6e9291cd5959.mp4"></video>
+
+  <div class="relative z-10 flex h-full flex-col">
+    <div class="px-6 md:px-12 lg:px-16 pt-6">
+      <nav class="liquid-glass rounded-xl px-4 py-2 flex items-center justify-between">
+        <a href="#top" class="text-2xl font-semibold tracking-tight">每日選股</a>
+        <div class="hidden md:flex items-center gap-8 text-sm">
+          <a href="#picks" class="transition-colors hover:text-gray-300">今日推薦</a>
+          <a href="#history" class="transition-colors hover:text-gray-300">歷史清單</a>
+          <a href="#method" class="transition-colors hover:text-gray-300">評分方式</a>
+          <a href="#sources" class="transition-colors hover:text-gray-300">資料來源</a>
+        </div>
+        <a href="#picks" class="bg-white text-black px-6 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">看今日推薦</a>
+      </nav>
+    </div>
+
+    <div class="px-6 md:px-12 lg:px-16 flex-1 flex flex-col justify-end pb-12 lg:pb-16">
+      <div class="lg:grid lg:grid-cols-2 lg:items-end">
+        <div>
+          <h1 id="heading" class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-normal mb-4" style="letter-spacing: -0.04em" aria-label="看懂大戶籌碼,上市櫃各選 20 檔。"></h1>
+          <p class="fade text-base md:text-lg text-gray-300 mb-5" data-delay="800" style="transition-duration: 1000ms">每個交易日盤後比對證交所與櫃買中心資料,依三大法人、千張大戶與融資變化計分,分別推薦上市 20 檔、上櫃 20 檔。</p>
+          <div class="fade flex flex-wrap gap-4" data-delay="1200" style="transition-duration: 1000ms">
+            <a href="#picks" class="bg-white text-black px-8 py-3 rounded-lg font-medium transition-colors hover:bg-gray-100">看今日推薦</a>
+            <a href="#method" class="liquid-glass border border-white/20 text-white px-8 py-3 rounded-lg font-medium transition-colors hover:bg-white hover:text-black">評分方式</a>
+          </div>
+        </div>
+        <div class="fade flex items-end justify-start lg:justify-end mt-8 lg:mt-0" data-delay="1400" style="transition-duration: 1000ms">
+          <div class="liquid-glass border border-white/20 px-6 py-3 rounded-xl">
+            <span class="text-lg md:text-xl lg:text-2xl font-light">法人。大戶。融資。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 今日推薦 ===== -->
+<main id="picks" class="px-6 md:px-12 lg:px-16 py-16 lg:py-24">
+  <div class="mx-auto max-w-6xl grid gap-8">
+    <header class="grid gap-6 lg:grid-cols-2 lg:items-end">
+      <div class="grid gap-2">
+        <p class="text-sm text-gray-400 tracking-wide" id="asof">盤後資料</p>
+        <h2 class="text-3xl md:text-4xl font-normal" style="letter-spacing: -0.03em" id="listTitle">上市推薦 20 檔</h2>
+      </div>
+      <div id="history" class="dates flex gap-2 overflow-x-auto pb-1 lg:justify-end" role="group" aria-label="選擇交易日"></div>
+    </header>
+
+    <section class="grid grid-cols-2 md:grid-cols-4 rounded-xl border border-white/20 overflow-hidden" aria-label="當日摘要">
+      <div class="p-4 md:p-5 grid gap-1 border-white/20"><span class="text-xs text-gray-400">推薦檔數</span><span class="text-2xl num" id="sCount">—</span></div>
+      <div class="p-4 md:p-5 grid gap-1 border-l border-white/20"><span class="text-xs text-gray-400">平均推薦分數</span><span class="text-2xl num" id="sAvg">—</span></div>
+      <div class="p-4 md:p-5 grid gap-1 border-t md:border-t-0 md:border-l border-white/20"><span class="text-xs text-gray-400">上漲 / 下跌</span><span class="text-2xl num" id="sUpDown">—</span></div>
+      <div class="p-4 md:p-5 grid gap-1 border-t border-l md:border-t-0 border-white/20 min-w-0"><span class="text-xs text-gray-400">最多檔的產業</span><span class="text-xl truncate" id="sSector">—</span></div>
+    </section>
+
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div class="liquid-glass border border-white/20 rounded-lg p-1 inline-flex gap-1" role="group" aria-label="市場">
+        <button type="button" id="m-twse" data-market="上市" class="mk px-4 py-1.5 rounded-md text-sm">上市 20</button>
+        <button type="button" id="m-otc" data-market="上櫃" class="mk px-4 py-1.5 rounded-md text-sm">上櫃 20</button>
+        <button type="button" id="m-all" data-market="全部" class="mk px-4 py-1.5 rounded-md text-sm">全部 40</button>
+      </div>
+      <label for="sortBy" class="flex items-center gap-3 text-sm text-gray-300">排序
+        <select id="sortBy" class="bg-black border border-white/20 rounded-lg px-3 py-2 text-sm text-white">
+          <option value="score">推薦分數</option>
+          <option value="chg">漲跌幅</option>
+          <option value="vol">成交量</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="list" class="grid gap-4 md:grid-cols-2"></div>
+  </div>
+</main>
+
+<!-- ===== 評分方式 / 資料來源 ===== -->
+<section class="px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
+  <div class="mx-auto max-w-6xl grid gap-10 lg:grid-cols-2 border-t border-white/20 pt-12">
+    <div id="method" class="grid gap-4 content-start">
+      <h2 class="text-2xl font-normal" style="letter-spacing: -0.03em">評分方式</h2>
+      <table class="w-full text-sm">
+        <tbody class="divide-y divide-white/10">
+          <tr><td class="py-2 text-gray-300">法人當日買超 ÷ 5 日均量</td><td class="py-2 text-right num">25</td></tr>
+          <tr><td class="py-2 text-gray-300">法人 5 日累計買超</td><td class="py-2 text-right num">25</td></tr>
+          <tr><td class="py-2 text-gray-300">外資、投信連續買超天數</td><td class="py-2 text-right num">10</td></tr>
+          <tr><td class="py-2 text-gray-300">千張大戶持股比例週增減</td><td class="py-2 text-right num">25</td></tr>
+          <tr><td class="py-2 text-gray-300">融資餘額減少</td><td class="py-2 text-right num">15</td></tr>
+        </tbody>
+      </table>
+      <p class="text-sm text-gray-400 max-w-prose">上市、上櫃分開計分與排名,各取前 20 名。只計 5 日均量 1,000 張以上、股價 10 元以上的普通股,且當日三大法人須為買超。</p>
+    </div>
+    <div id="sources" class="grid gap-4 content-start">
+      <h2 class="text-2xl font-normal" style="letter-spacing: -0.03em">資料來源</h2>
+      <ul class="grid gap-2 text-sm text-gray-300 list-disc pl-5">
+        <li>臺灣證券交易所:三大法人買賣超、每日收盤行情、融資融券餘額</li>
+        <li>證券櫃檯買賣中心:上櫃三大法人、收盤行情、融資融券</li>
+        <li>臺灣集中保管結算所:集保戶股權分散表(每週)</li>
+      </ul>
+      <p class="text-sm text-gray-400" id="genAt"></p>
+    </div>
+  </div>
+  <p class="mx-auto max-w-6xl mt-12 text-xs text-gray-500">本站整理公開籌碼資料並排序,僅供研究參考,不構成任何投資建議。投資前請自行評估風險。</p>
+</section>
+
+<script>
+(function () {
+  // ---- 進場動畫 ----
+  const H = "看懂大戶籌碼\n上市櫃各選 20 檔。", CHAR_DELAY = 30, START = 200;
+  const lines = H.split("\n");
+  const h1 = document.getElementById("heading");
+  h1.innerHTML = lines.map((line, li) => [...line].map((ch, ci) =>
+    `<span class="char" aria-hidden="true" style="transition-delay:${li * line.length * CHAR_DELAY + ci * CHAR_DELAY}ms">${ch === " " ? " " : ch}</span>`
+  ).join("")).join("<br>");
+  setTimeout(() => h1.querySelectorAll(".char").forEach((c) => c.classList.add("on")), START);
+  document.querySelectorAll(".fade").forEach((el) => setTimeout(() => el.classList.add("on"), +el.dataset.delay));
+
+  // ---- 資料:由 build_site.py 從證交所/櫃買中心/集保盤後資料計算後嵌入 ----
+  const DATA = /*DATA*/null;
+  const WEEK = "日一二三四五六";
+  const days = (DATA && DATA.days) || [];
+  const parseDay = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const store = {
+    get(k) { try { return localStorage.getItem("picks-" + k); } catch (_) { return null; } },
+    set(k, v) { try { localStorage.setItem("picks-" + k, v); } catch (_) {} },
+  };
+  const state = { day: days.length ? days[0].date : null, market: store.get("market") || "上市", sort: store.get("sort") || "score" };
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n.toLocaleString("zh-TW");
+  const cls = (n) => (n > 0 ? "up" : n < 0 ? "down" : "flat");
+
+  function spark(raw, labels) {
+    const idx = raw.map((v, i) => i).filter((i) => raw[i] != null);
+    const s = idx.map((i) => raw[i]);
+    labels = idx.map((i) => labels[i]);
+    if (s.length < 2) return "";
+    const W = 200, Hh = 56, P = 6;
+    const min = Math.min(...s), max = Math.max(...s), span = max - min || 1;
+    const x = (i) => P + (i * (W - P * 2)) / (s.length - 1);
+    const y = (v) => Hh - P - ((v - min) / span) * (Hh - P * 2);
+    const pts = s.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+    const color = s[s.length - 1] >= s[0] ? "var(--up)" : "var(--down)";
+    const area = `M${pts[0]} L${pts.join(" L")} L${x(s.length - 1)},${Hh - P} L${x(0)},${Hh - P} Z`;
+    const dots = s.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="${i === s.length - 1 ? 3.5 : 8}" fill="${i === s.length - 1 ? color : "transparent"}"><title>${labels[i]} 收盤 ${v}</title></circle>`).join("");
+    return `<svg class="spark" viewBox="0 0 ${W} ${Hh}" role="img" aria-label="近 5 日收盤走勢">
+      <line stroke="rgba(255,255,255,0.12)" x1="${P}" x2="${W - P}" y1="${y(min)}" y2="${y(min)}"/>
+      <line stroke="rgba(255,255,255,0.12)" x1="${P}" x2="${W - P}" y1="${y(max)}" y2="${y(max)}"/>
+      <path d="${area}" fill="${color}" fill-opacity="0.14"/>
+      <polyline points="${pts.join(" ")}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+      ${dots}</svg>`;
+  }
+
+  function card(p, day) {
+    const vals = p.series.filter((v) => v != null);
+    const top = p.rank <= 3;
+    return `<article class="rounded-xl border ${top ? "border-white/40" : "border-white/15"} bg-white/[0.04] p-5 grid gap-4 min-w-0">
+      <div class="flex items-center gap-3">
+        <span class="w-7 h-7 rounded-full grid place-items-center text-xs num ${top ? "bg-white text-black" : "border border-white/20 text-gray-300"}" title="推薦排名">${p.rank}</span>
+        <div class="min-w-0 flex-1">
+          <div class="text-lg font-medium leading-tight">${p.name}<span class="ml-2 text-sm text-gray-400 num">${p.code}</span></div>
+          <div class="text-xs text-gray-400">${p.market}・${p.sector}</div>
+        </div>
+        <div class="ring" style="--p:${p.score}" title="推薦分數 ${p.score} / 100"><span class="num">${p.score}</span></div>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-5 items-center">
+        <div class="grid gap-1">
+          <span class="text-2xl font-medium num">${fmt(p.close)}</span>
+          <span class="text-sm font-medium num ${cls(p.chg)}">${p.chg > 0 ? "▲" : p.chg < 0 ? "▼" : ""}${Math.abs(p.chg).toFixed(2)}%</span>
+          <span class="text-xs text-gray-400 num">成交 ${fmt(p.vol)} 張</span>
+        </div>
+        <div class="min-w-0 grid gap-1">${spark(p.series, day.seriesDates)}
+          <div class="flex justify-between text-[11px] text-gray-500"><span>近 5 日收盤</span><span class="num">${fmt(Math.min(...vals))} – ${fmt(Math.max(...vals))}</span></div>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">${p.tags.map((t) => `<span class="liquid-glass border border-white/20 rounded-full px-3 py-0.5 text-xs text-gray-200">${t}</span>`).join("")}</div>
+      <p class="text-sm text-gray-300 leading-relaxed">${p.reason}</p>
+    </article>`;
+  }
+
+  function render() {
+    if (!days.length) {
+      $("list").innerHTML = `<div class="md:col-span-2 rounded-xl border border-dashed border-white/20 p-10 text-center text-gray-300">還沒有匯入推薦資料。請執行 build_site.py 產生網頁。</div>`;
+      return;
+    }
+    const day = days.find((d) => d.date === state.day) || days[0];
+    $("history").innerHTML = days.map((dd) => {
+      const d = parseDay(dd.date), on = dd.date === day.date;
+      return `<button type="button" id="d-${dd.date}" data-day="${dd.date}" aria-pressed="${on}"
+        class="flex-none grid justify-items-center min-w-[68px] px-3 py-2 rounded-lg text-sm transition-colors ${on ? "bg-white text-black" : "liquid-glass border border-white/20 text-gray-300 hover:text-white"}">
+        <span class="font-medium num">${d.getMonth() + 1}/${d.getDate()}</span><span class="text-[11px] ${on ? "text-gray-600" : "text-gray-400"}">週${WEEK[d.getDay()]}</span></button>`;
+    }).join("");
+    document.querySelectorAll(".mk").forEach((b) => {
+      const on = b.dataset.market === state.market;
+      b.setAttribute("aria-pressed", on);
+      b.className = `mk px-4 py-1.5 rounded-md text-sm transition-colors ${on ? "bg-white text-black" : "text-gray-300 hover:text-white"}`;
+    });
+    $("sortBy").value = state.sort;
+    const d = parseDay(day.date);
+    const ub = day.universeByMarket || {};
+    const pool = state.market === "全部" ? day.universe : (ub[state.market] ?? day.universe);
+    $("asof").textContent = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} 週${WEEK[d.getDay()]} 盤後・從 ${fmt(pool)} 檔${state.market === "全部" ? "上市櫃" : state.market}股中挑選`;
+    const n = day.picks.filter((p) => state.market === "全部" || p.market === state.market).length;
+    $("listTitle").textContent = `${state.market === "全部" ? "上市櫃" : state.market}推薦 ${n} 檔`;
+    $("genAt").textContent = `本頁資料更新於 ${DATA.generatedAt},集保股權分散表為 ${day.tdccDate} 當週。`;
+
+    let rows = day.picks.filter((p) => state.market === "全部" || p.market === state.market);
+    const key = { score: (p) => p.score, chg: (p) => p.chg, vol: (p) => p.vol }[state.sort];
+    rows = rows.slice().sort((a, b) => key(b) - key(a));
+
+    $("sCount").textContent = rows.length;
+    $("sAvg").textContent = rows.length ? (rows.reduce((s, p) => s + p.score, 0) / rows.length).toFixed(1) : "—";
+    const up = rows.filter((p) => p.chg > 0).length, down = rows.filter((p) => p.chg < 0).length;
+    $("sUpDown").innerHTML = `<span class="up">${up}</span> / <span class="down">${down}</span>`;
+    const sec = {};
+    rows.forEach((p) => (sec[p.sector] = (sec[p.sector] || 0) + 1));
+    const topSec = Object.entries(sec).sort((a, b) => b[1] - a[1])[0];
+    $("sSector").textContent = topSec ? `${topSec[0]}(${topSec[1]} 檔)` : "—";
+
+    $("list").innerHTML = rows.length ? rows.map((p) => card(p, day)).join("")
+      : `<div class="md:col-span-2 rounded-xl border border-dashed border-white/20 p-10 text-center text-gray-300">這一天沒有${state.market}的推薦股,換個市場看看。</div>`;
+  }
+
+  $("history").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-day]");
+    if (b) { state.day = b.dataset.day; render(); }
+  });
+  document.querySelectorAll(".mk").forEach((b) => b.addEventListener("click", () => {
+    state.market = b.dataset.market; store.set("market", state.market); render();
+  }));
+  $("sortBy").addEventListener("change", (e) => { state.sort = e.target.value; store.set("sort", state.sort); render(); });
+
+  render();
+})();
+</script>

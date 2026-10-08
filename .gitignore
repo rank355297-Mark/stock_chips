@@ -1,0 +1,5 @@
+# 原始下載資料(可隨時重新抓取)
+cache/
+# build_site.py 自動產生的發布檔
+site_publish.html
+__pycache__/

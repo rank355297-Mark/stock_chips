@@ -1,0 +1,267 @@
+<title>每天股票推薦系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@900&family=Roboto+Mono:wght@500;600&display=swap">
+<style>
+/* 版面:像一張每日盤後選股單 — 頂部日期軸與當日摘要,下方推薦卡片(手機單欄、桌機雙欄) */
+:root {
+  --bg: #f2f3f5;
+  --surface: #ffffff;
+  --ink: #161b22;
+  --ink-2: #555e6c;
+  --muted: #8a919c;
+  --line: #e1e4e9;
+  --accent: #a8620b;        /* 琥珀:精選、目前選取 */
+  --accent-wash: #fbf0df;
+  --up: #d03535;            /* 台股慣例:紅漲 */
+  --down: #13874f;          /* 綠跌 */
+  --up-wash: #fbe9e9;
+  --down-wash: #e3f4ea;
+  --ring-track: #eceef1;
+  --font-display: "Noto Serif TC", "PMingLiU", "Songti TC", serif;
+  --font-body: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+  --font-num: "Roboto Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101317; --surface: #181c22; --ink: #eef0f3; --ink-2: #b3bac4; --muted: #7d8590; --line: #2a3038;
+    --accent: #f0a63c; --accent-wash: #2d2416; --up: #ff6161; --down: #33c27a; --up-wash: #341c1e; --down-wash: #16291f;
+    --ring-track: #262b33; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101317; --surface: #181c22; --ink: #eef0f3; --ink-2: #b3bac4; --muted: #7d8590; --line: #2a3038;
+  --accent: #f0a63c; --accent-wash: #2d2416; --up: #ff6161; --down: #33c27a; --up-wash: #341c1e; --down-wash: #16291f;
+  --ring-track: #262b33; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; display: grid; gap: 20px; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--ink-2); }
+
+header { display: grid; gap: 12px; }
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; justify-content: space-between; }
+h1 { margin: 0; font-family: var(--font-display); font-weight: 900; font-size: clamp(26px, 6vw, 38px); line-height: 1.2; letter-spacing: 0.02em; text-wrap: balance; }
+.demo { font-size: 12.5px; color: var(--accent); background: var(--accent-wash); border: 1px solid var(--accent); padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.lede { margin: 0; color: var(--ink-2); max-width: 60ch; }
+
+.dates { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.dates button {
+  flex: none; display: grid; justify-items: center; gap: 0; min-width: 64px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
+  padding: 7px 12px; border-radius: 10px; cursor: pointer; font: inherit;
+}
+.dates button .d { font: 600 15px/1.2 var(--font-num); color: var(--ink); }
+.dates button .w { font-size: 11.5px; }
+.dates button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-wash); }
+.dates button[aria-pressed="true"] .d { color: var(--accent); }
+button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.summary div { padding: 12px 16px; display: grid; gap: 2px; border-left: 1px solid var(--line); min-width: 0; }
+.summary div:first-child { border-left: 0; }
+.summary .k { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+.summary .v { font: 600 20px/1.3 var(--font-num); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.summary .v.txt { font-family: var(--font-body); font-weight: 700; font-size: 18px; }
+.demo.real { color: var(--ink-2); background: var(--surface); border-color: var(--line); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; }
+.seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 2px; }
+.seg button { border: 0; background: transparent; color: var(--ink-2); font: inherit; font-size: 14px; padding: 6px 14px; border-radius: 7px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.sort { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); }
+.sort select { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; }
+
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.card.top3 { border-color: var(--accent); }
+.c-head { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; }
+.rank { font: 600 13px/1 var(--font-num); color: var(--muted); width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--line); }
+.top3 .rank { color: var(--accent); border-color: var(--accent); background: var(--accent-wash); }
+.who { min-width: 0; }
+.who .name { font-weight: 700; font-size: 17px; line-height: 1.3; }
+.who .name .code { font: 500 13px var(--font-num); color: var(--ink-2); margin-left: 6px; }
+.who .meta { font-size: 12.5px; color: var(--muted); }
+.ring { --p: 80; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center;
+  background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--ring-track) 0); }
+.ring span { width: 42px; height: 42px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; font: 600 15px/1 var(--font-num); }
+
+.c-mid { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: center; }
+.price .close { font: 600 22px/1.2 var(--font-num); }
+.chg { display: inline-block; font: 600 13px/1.4 var(--font-num); padding: 1px 7px; border-radius: 5px; }
+.chg.up { background: var(--up-wash); } .chg.down { background: var(--down-wash); }
+.price .vol { font-size: 12px; color: var(--muted); }
+.spark { width: 100%; max-width: 100%; height: auto; display: block; }
+.spark .grid-l { stroke: var(--line); stroke-width: 1; }
+.spark-wrap { min-width: 0; display: grid; gap: 2px; }
+.spark-cap { font-size: 11.5px; color: var(--muted); display: flex; justify-content: space-between; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 12px; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); }
+.reason { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.empty { grid-column: 1 / -1; text-align: center; padding: 40px 16px; color: var(--ink-2); background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; }
+
+.foot { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 6px; }
+.foot p { margin: 0; max-width: 70ch; }
+
+@media (max-width: 720px) {
+  .grid { grid-template-columns: 1fr; }
+  .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary div:nth-child(3) { border-left: 0; }
+  .summary div:nth-child(n+3) { border-top: 1px solid var(--line); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card { animation: rise .35s ease both; }
+  @keyframes rise { from { transform: translateY(6px); } to { transform: none; } }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="top">
+      <h1>每天股票推薦系統</h1>
+      <span class="demo" id="badge">證交所・櫃買中心盤後資料</span>
+    </div>
+    <p class="lede">每個交易日盤後,依三大法人、千張大戶與融資變化計算籌碼分數,挑出上市櫃前 10 名。點日期看其他天的清單,也能依市場篩選、換排序方式。</p>
+    <div class="dates" id="dates" role="group" aria-label="選擇交易日"></div>
+  </header>
+
+  <section class="summary" aria-label="當日摘要">
+    <div><span class="k">推薦檔數</span><span class="v num" id="sCount">10</span></div>
+    <div><span class="k">平均推薦分數</span><span class="v num" id="sAvg">—</span></div>
+    <div><span class="k">上漲 / 下跌</span><span class="v num" id="sUpDown">—</span></div>
+    <div><span class="k">最多檔的產業</span><span class="v txt" id="sSector">—</span></div>
+  </section>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="市場">
+      <button type="button" id="m-all" data-market="全部" aria-pressed="true">全部</button>
+      <button type="button" id="m-twse" data-market="上市" aria-pressed="false">上市</button>
+      <button type="button" id="m-otc" data-market="上櫃" aria-pressed="false">上櫃</button>
+    </div>
+    <label class="sort" for="sortBy">排序
+      <select id="sortBy">
+        <option value="score">推薦分數</option>
+        <option value="chg">漲跌幅</option>
+        <option value="vol">成交量</option>
+      </select>
+    </label>
+  </div>
+
+  <main class="grid" id="list"></main>
+
+  <footer class="foot">
+    <p>資料來源:臺灣證券交易所、證券櫃檯買賣中心(三大法人、收盤行情、融資融券)與集保結算所(股權分散表)。成交量單位為張。<span id="genAt"></span></p>
+    <p>推薦分數 = 法人當日買超 25 + 法人 5 日累計 25 + 外資/投信連買 10 + 千張大戶週增減 25 + 融資減少 15。只計 5 日均量 1,000 張以上、股價 10 元以上的普通股。</p>
+    <p>不構成任何投資建議。投資前請自行查證並評估風險。</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  // ---- 資料:由 build_site.py 從證交所/櫃買中心/集保盤後資料計算後嵌入 ----
+  const DATA = /*DATA*/null;
+  const WEEK = "日一二三四五六";
+  const parseDay = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  // ---- 狀態 ----
+  const days = (DATA && DATA.days) || [];
+  const store = {
+    get(k) { try { return localStorage.getItem("picks-" + k); } catch (_) { return null; } },
+    set(k, v) { try { localStorage.setItem("picks-" + k, v); } catch (_) {} },
+  };
+  const state = { day: days.length ? days[0].date : null, market: store.get("market") || "全部", sort: store.get("sort") || "score" };
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => n.toLocaleString("zh-TW");
+  const cls = (n) => (n > 0 ? "up" : n < 0 ? "down" : "flat");
+
+  function spark(raw, labels) {
+    const idx = raw.map((v, i) => i).filter((i) => raw[i] != null);
+    const s = idx.map((i) => raw[i]);
+    labels = idx.map((i) => labels[i]);
+    if (s.length < 2) return "";
+    const W = 200, H = 56, P = 6;
+    const min = Math.min(...s), max = Math.max(...s), span = max - min || 1;
+    const x = (i) => P + (i * (W - P * 2)) / (s.length - 1);
+    const y = (v) => H - P - ((v - min) / span) * (H - P * 2);
+    const pts = s.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+    const color = s[s.length - 1] >= s[0] ? "var(--up)" : "var(--down)";
+    const area = `M${pts[0]} L${pts.join(" L")} L${x(s.length - 1)},${H - P} L${x(0)},${H - P} Z`;
+    const dots = s.map((v, i) => `<circle cx="${x(i)}" cy="${y(v)}" r="${i === s.length - 1 ? 3.5 : 8}" fill="${i === s.length - 1 ? color : "transparent"}"><title>${labels[i]} 收盤 ${v}</title></circle>`).join("");
+    return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="近 5 日收盤走勢">
+      <line class="grid-l" x1="${P}" x2="${W - P}" y1="${y(min)}" y2="${y(min)}"/>
+      <line class="grid-l" x1="${P}" x2="${W - P}" y1="${y(max)}" y2="${y(max)}"/>
+      <path d="${area}" fill="${color}" fill-opacity="0.12"/>
+      <polyline points="${pts.join(" ")}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/>
+      ${dots}</svg>`;
+  }
+
+  function render() {
+    // 日期
+    if (!days.length) {
+      $("list").innerHTML = `<div class="empty">還沒有匯入推薦資料。請執行 build_site.py 產生網頁。</div>`;
+      return;
+    }
+    $("dates").innerHTML = days.map((day) => {
+      const k = day.date, d = parseDay(k);
+      return `<button type="button" id="d-${k}" data-day="${k}" aria-pressed="${k === state.day}"><span class="d">${d.getMonth() + 1}/${d.getDate()}</span><span class="w">週${WEEK[d.getDay()]}</span></button>`;
+    }).join("");
+    document.querySelectorAll(".seg button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.market === state.market));
+    $("sortBy").value = state.sort;
+
+    const day = days.find((d) => d.date === state.day) || days[0];
+    const all = day.picks;
+    $("genAt").textContent = `本頁資料更新於 ${DATA.generatedAt},集保股權分散表為 ${day.tdccDate} 當週。`;
+    let rows = all.filter((p) => state.market === "全部" || p.market === state.market);
+    const key = { score: (p) => p.score, chg: (p) => p.chg, vol: (p) => p.vol }[state.sort];
+    rows = rows.slice().sort((a, b) => key(b) - key(a));
+
+    // 摘要
+    $("sCount").textContent = rows.length;
+    $("sAvg").textContent = rows.length ? (rows.reduce((s, p) => s + p.score, 0) / rows.length).toFixed(1) : "—";
+    const up = rows.filter((p) => p.chg > 0).length, down = rows.filter((p) => p.chg < 0).length;
+    $("sUpDown").innerHTML = `<span class="up">${up}</span> / <span class="down">${down}</span>`;
+    const sec = {};
+    rows.forEach((p) => (sec[p.sector] = (sec[p.sector] || 0) + 1));
+    const topSec = Object.entries(sec).sort((a, b) => b[1] - a[1])[0];
+    $("sSector").textContent = topSec ? `${topSec[0]}(${topSec[1]} 檔)` : "—";
+
+    // 卡片
+    $("list").innerHTML = rows.length ? rows.map((p) => `
+      <article class="card${p.rank <= 3 ? " top3" : ""}">
+        <div class="c-head">
+          <span class="rank" title="推薦排名">${p.rank}</span>
+          <div class="who">
+            <div class="name">${p.name}<span class="code">${p.code}</span></div>
+            <div class="meta">${p.market}・${p.sector}</div>
+          </div>
+          <div class="ring" style="--p:${p.score}" title="推薦分數 ${p.score} / 100"><span>${p.score}</span></div>
+        </div>
+        <div class="c-mid">
+          <div class="price">
+            <div class="close num">${fmt(p.close)}</div>
+            <span class="chg ${cls(p.chg)}">${p.chg > 0 ? "▲" : p.chg < 0 ? "▼" : ""}${Math.abs(p.chg).toFixed(2)}%</span>
+            <div class="vol num">成交 ${fmt(p.vol)} 張</div>
+          </div>
+          <div class="spark-wrap">${spark(p.series, day.seriesDates)}
+            <div class="spark-cap"><span>近 5 日收盤</span><span class="num">${fmt(Math.min(...p.series.filter((v) => v != null)))} – ${fmt(Math.max(...p.series.filter((v) => v != null)))}</span></div>
+          </div>
+        </div>
+        <div class="tags">${p.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>
+        <p class="reason">${p.reason}</p>
+      </article>`).join("") : `<div class="empty">這一天沒有${state.market}的推薦股,換個市場看看。</div>`;
+  }
+
+  $("dates").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-day]");
+    if (b) { state.day = b.dataset.day; render(); }
+  });
+  document.querySelector(".seg").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-market]");
+    if (b) { state.market = b.dataset.market; store.set("market", state.market); render(); }
+  });
+  $("sortBy").addEventListener("change", (e) => { state.sort = e.target.value; store.set("sort", state.sort); render(); });
+
+  render();
+})();
+</script>

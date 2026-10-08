@@ -85,6 +85,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
         <div class="hidden md:flex items-center gap-8 text-sm">
           <a href="#picks" class="transition-colors hover:text-gray-300">今日推薦</a>
           <a href="#history" class="transition-colors hover:text-gray-300">歷史清單</a>
+          <a href="#turnover" class="transition-colors hover:text-gray-300">週轉率</a>
           <a href="#method" class="transition-colors hover:text-gray-300">評分方式</a>
           <a href="#sources" class="transition-colors hover:text-gray-300">資料來源</a>
         </div>
@@ -148,6 +149,32 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
     <div id="list" class="grid gap-4 md:grid-cols-2"></div>
   </div>
 </main>
+
+<!-- ===== 週轉率排行 ===== -->
+<section id="turnover" class="px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
+  <div class="mx-auto max-w-6xl grid gap-6">
+    <div class="grid gap-2">
+      <h2 class="text-3xl md:text-4xl font-normal" style="letter-spacing: -0.03em" id="toTitle">上市週轉率前 20 名</h2>
+      <p class="text-sm text-gray-400 max-w-prose">週轉率 = 當日成交股數 ÷ 已發行股數。數字越高,代表當天換手越熱絡,常見於題材股,股價波動通常也比較大。只計普通股。</p>
+    </div>
+    <div class="overflow-x-auto rounded-xl border border-white/20">
+      <table class="w-full text-sm min-w-[640px]">
+        <thead class="text-xs text-gray-400 text-left whitespace-nowrap">
+          <tr class="border-b border-white/20">
+            <th class="py-3 pl-4 pr-2 font-normal w-12">名次</th>
+            <th class="py-3 px-2 font-normal">股票</th>
+            <th class="py-3 px-2 font-normal text-right">收盤</th>
+            <th class="py-3 px-2 font-normal text-right">漲跌幅</th>
+            <th class="py-3 px-2 font-normal text-right">成交量(張)</th>
+            <th class="py-3 px-2 font-normal text-right">成交金額(億)</th>
+            <th class="py-3 pl-2 pr-4 font-normal w-48">週轉率</th>
+          </tr>
+        </thead>
+        <tbody id="toRows" class="divide-y divide-white/10"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
 
 <!-- ===== 評分方式 / 資料來源 ===== -->
 <section class="px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
@@ -252,6 +279,32 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
     </article>`;
   }
 
+  // 週轉率排行:上市/上櫃各前 20;「全部」取兩市場合併後的前 20
+  function renderTurnover(day) {
+    const label = state.market === "全部" ? "上市櫃" : state.market;
+    $("toTitle").textContent = `${label}週轉率前 20 名`;
+    let rows = (day.turnover || []).filter((x) => state.market === "全部" || x.market === state.market);
+    rows = rows.slice().sort((a, b) => b.turnover - a.turnover).slice(0, 20);
+    if (!rows.length) {
+      $("toRows").innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400">這一天沒有週轉率資料。</td></tr>`;
+      return;
+    }
+    const max = rows[0].turnover;
+    $("toRows").innerHTML = rows.map((x, i) => `<tr>
+      <td class="py-3 pl-4 pr-2 num text-gray-400">${i + 1}</td>
+      <td class="py-3 px-2 whitespace-nowrap"><span class="font-medium">${x.name}</span><span class="ml-2 text-xs text-gray-400 num">${x.code}</span>
+        ${x.inPicks ? `<span class="ml-2 text-[11px] px-2 py-0.5 rounded-full bg-white text-black align-middle">推薦股</span>` : ""}
+        <div class="text-xs text-gray-500">${state.market === "全部" ? x.market + "・" : ""}${x.sector}</div></td>
+      <td class="py-3 px-2 text-right num">${fmt(x.close)}</td>
+      <td class="py-3 px-2 text-right num ${cls(x.chgPct)}">${x.chgPct > 0 ? "+" : ""}${x.chgPct.toFixed(2)}%</td>
+      <td class="py-3 px-2 text-right num">${fmt(x.volume)}</td>
+      <td class="py-3 px-2 text-right num">${x.value.toFixed(2)}</td>
+      <td class="py-3 pl-2 pr-4"><div class="flex items-center gap-3">
+        <span class="num w-16 text-right">${x.turnover.toFixed(2)}%</span>
+        <span class="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden"><span class="block h-full rounded-full bg-white" style="width:${(x.turnover / max * 100).toFixed(1)}%"></span></span>
+      </div></td></tr>`).join("");
+  }
+
   function render() {
     if (!days.length) {
       $("list").innerHTML = `<div class="md:col-span-2 rounded-xl border border-dashed border-white/20 p-10 text-center text-gray-300">還沒有匯入推薦資料。請執行 build_site.py 產生網頁。</div>`;
@@ -293,6 +346,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
     const topSec = Object.entries(sec).sort((a, b) => b[1] - a[1])[0];
     $("sSector").textContent = topSec ? `${topSec[0]}(${topSec[1]} 檔)` : "—";
 
+    renderTurnover(day);
     $("list").innerHTML = rows.length ? rows.map((p) => card(p, day)).join("")
       : `<div class="md:col-span-2 rounded-xl border border-dashed border-white/20 p-10 text-center text-gray-300">這一天沒有${state.market}的推薦股,換個市場看看。</div>`;
   }

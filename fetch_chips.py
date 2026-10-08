@@ -116,12 +116,14 @@ def twse_price(d):
                     f"twse_price_{d:%Y%m%d}.json")
     if not j:
         return None
-    table = next(t for t in j["tables"] if t.get("fields") and t["fields"][0] == "證券代號" and "收盤價" in t["fields"])
+    table = next((t for t in j["tables"] if t.get("fields") and t["fields"][0] == "證券代號" and "收盤價" in t["fields"]), None)
+    if not table:
+        return None
     out = {}
     for r in table["data"]:
         close = num(r[8])
         diff = num(r[10]) * (-1 if "-" in r[9] else 1)
-        out[r[0].strip()] = {"vol": num(r[2]), "value": num(r[4]), "close": close, "diff": diff}
+        out[r[0].strip()] = {"name": r[1].strip(), "vol": num(r[2]), "value": num(r[4]), "close": close, "diff": diff}
     return out
 
 
@@ -132,8 +134,44 @@ def tpex_price(d):
         return None
     out = {}
     for r in j["tables"][0]["data"]:
-        out[r[0].strip()] = {"vol": num(r[7]), "value": num(r[8]), "close": num(r[2]), "diff": num(r[3])}
+        out[r[0].strip()] = {"name": r[1].strip(), "vol": num(r[7]), "value": num(r[8]), "close": num(r[2]),
+                             "diff": num(r[3]), "shares": num(r[14])}
     return out
+
+
+def twse_shares():
+    """上市公司已發行普通股數(證交所公司基本資料),快取 7 天。"""
+    path = os.path.join(CACHE, "twse_shares.json")
+    if os.path.exists(path) and time.time() - os.path.getmtime(path) < 7 * 86400:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    rows = json.loads(http_get("https://openapi.twse.com.tw/v1/opendata/t187ap03_L", sleep=1))
+    out = {r["公司代號"].strip(): num(r.get("已發行普通股數或TDR原股發行股數", 0)) for r in rows if r.get("公司代號")}
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(out, f)
+    return out
+
+
+def turnover_rank(d, n=20):
+    """當日週轉率(成交股數 ÷ 已發行股數)排行,上市、上櫃各取前 n 名,只計普通股。"""
+    result = {}
+    for mk, prices, shares in (("上市", twse_price(d) or {}, twse_shares()),
+                               ("上櫃", tpex_price(d) or {}, None)):
+        rows = []
+        for code, p in prices.items():
+            sh = p.get("shares") if shares is None else shares.get(code)
+            if not is_common_stock(code) or not sh or not p["vol"] or not p["close"]:
+                continue
+            prev = p["close"] - p["diff"]
+            rows.append({"code": code, "name": p["name"], "market": mk, "close": p["close"],
+                         "chgPct": round(p["diff"] / prev * 100, 2) if prev else 0,
+                         "volume": round(p["vol"] / 1000), "value": round(p["value"] / 1e8, 2),
+                         "turnover": round(p["vol"] / sh * 100, 2)})
+        rows.sort(key=lambda x: -x["turnover"])
+        for i, x in enumerate(rows[:n], 1):
+            x["rank"] = i
+        result[mk] = rows[:n]
+    return result
 
 
 def margins(d):
@@ -374,6 +412,7 @@ def main():
         "tdccDate": tw(tdcc_date), "tdccPrevDate": tw(prev_date) if prev_date else None,
         "universe": len(rows), "universeByMarket": universe, "topN": TOP_N, "weights": WEIGHTS,
         "marginPending": sorted(margin_missing),
+        "turnover": turnover_rank(d0, TOP_N),
         "filters": {"minAvgLots": MIN_AVG_LOTS, "minPrice": MIN_PRICE, "lookback": LOOKBACK},
         "picks": picks,
     }
@@ -383,6 +422,8 @@ def main():
     print("輸出:", path)
     for x in picks:
         print(x["market"], x["rank"], x["code"], x["name"], x["score"], x["instNet"], x["bigChg"], x["tags"])
+    for mk, rows in doc["turnover"].items():
+        print(f"週轉率 {mk} 前 3:", [(x["code"], x["name"], x["turnover"]) for x in rows[:3]])
 
 
 if __name__ == "__main__":

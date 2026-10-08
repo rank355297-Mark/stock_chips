@@ -1,6 +1,6 @@
 {
  "date": "2026-10-05",
- "generatedAt": "2026-10-08T15:47+08:00",
+ "generatedAt": "2026-10-08T15:54+08:00",
  "tradingDays": [
   "2026-10-05",
   "2026-10-02",
@@ -25,6 +25,452 @@
   "broker": 0
  },
  "marginPending": [],
+ "turnover": {
+  "上市": [
+   {
+    "code": "6226",
+    "name": "光鼎",
+    "market": "上市",
+    "close": 43.0,
+    "chgPct": -7.33,
+    "volume": 36414,
+    "value": 16.85,
+    "turnover": 31.52,
+    "rank": 1
+   },
+   {
+    "code": "3094",
+    "name": "聯傑",
+    "market": "上市",
+    "close": 69.0,
+    "chgPct": -1.85,
+    "volume": 24280,
+    "value": 17.16,
+    "turnover": 29.21,
+    "rank": 2
+   },
+   {
+    "code": "2484",
+    "name": "希華",
+    "market": "上市",
+    "close": 86.4,
+    "chgPct": -0.12,
+    "volume": 34033,
+    "value": 30.35,
+    "turnover": 21.35,
+    "rank": 3
+   },
+   {
+    "code": "2492",
+    "name": "華新科",
+    "market": "上市",
+    "close": 368.5,
+    "chgPct": 1.94,
+    "volume": 95780,
+    "value": 362.48,
+    "turnover": 19.74,
+    "rank": 4
+   },
+   {
+    "code": "8039",
+    "name": "台虹",
+    "market": "上市",
+    "close": 303.5,
+    "chgPct": 2.53,
+    "volume": 49438,
+    "value": 147.02,
+    "turnover": 18.74,
+    "rank": 5
+   },
+   {
+    "code": "1727",
+    "name": "中華化",
+    "market": "上市",
+    "close": 117.5,
+    "chgPct": -4.47,
+    "volume": 22434,
+    "value": 27.03,
+    "turnover": 17.52,
+    "rank": 6
+   },
+   {
+    "code": "6672",
+    "name": "騰輝電子-KY",
+    "market": "上市",
+    "close": 451.0,
+    "chgPct": 2.73,
+    "volume": 13345,
+    "value": 59.89,
+    "turnover": 16.35,
+    "rank": 7
+   },
+   {
+    "code": "6168",
+    "name": "宏齊",
+    "market": "上市",
+    "close": 47.1,
+    "chgPct": 2.39,
+    "volume": 31809,
+    "value": 15.32,
+    "turnover": 15.46,
+    "rank": 8
+   },
+   {
+    "code": "2481",
+    "name": "強茂",
+    "market": "上市",
+    "close": 180.5,
+    "chgPct": 3.44,
+    "volume": 55983,
+    "value": 104.09,
+    "turnover": 14.65,
+    "rank": 9
+   },
+   {
+    "code": "8150",
+    "name": "南茂",
+    "market": "上市",
+    "close": 124.0,
+    "chgPct": -2.36,
+    "volume": 98414,
+    "value": 124.64,
+    "turnover": 13.97,
+    "rank": 10
+   },
+   {
+    "code": "8261",
+    "name": "富鼎",
+    "market": "上市",
+    "close": 205.0,
+    "chgPct": 9.92,
+    "volume": 15768,
+    "value": 31.61,
+    "turnover": 13.26,
+    "rank": 11
+   },
+   {
+    "code": "2409",
+    "name": "友達",
+    "market": "上市",
+    "close": 39.05,
+    "chgPct": -3.46,
+    "volume": 965082,
+    "value": 393.99,
+    "turnover": 12.79,
+    "rank": 12
+   },
+   {
+    "code": "4956",
+    "name": "光鋐",
+    "market": "上市",
+    "close": 45.55,
+    "chgPct": -1.83,
+    "volume": 12676,
+    "value": 5.94,
+    "turnover": 12.62,
+    "rank": 13
+   },
+   {
+    "code": "6834",
+    "name": "天二科技",
+    "market": "上市",
+    "close": 125.5,
+    "chgPct": -4.2,
+    "volume": 10894,
+    "value": 13.86,
+    "turnover": 12.31,
+    "rank": 14
+   },
+   {
+    "code": "3311",
+    "name": "閎暉",
+    "market": "上市",
+    "close": 49.5,
+    "chgPct": -0.3,
+    "volume": 12252,
+    "value": 6.19,
+    "turnover": 12.25,
+    "rank": 15
+   },
+   {
+    "code": "6533",
+    "name": "晶心科",
+    "market": "上市",
+    "close": 336.0,
+    "chgPct": -4.55,
+    "volume": 6040,
+    "value": 20.6,
+    "turnover": 11.93,
+    "rank": 16
+   },
+   {
+    "code": "4989",
+    "name": "榮科",
+    "market": "上市",
+    "close": 70.2,
+    "chgPct": 9.86,
+    "volume": 19470,
+    "value": 13.33,
+    "turnover": 11.27,
+    "rank": 17
+   },
+   {
+    "code": "2464",
+    "name": "盟立",
+    "market": "上市",
+    "close": 191.0,
+    "chgPct": -2.3,
+    "volume": 23186,
+    "value": 45.8,
+    "turnover": 10.7,
+    "rank": 18
+   },
+   {
+    "code": "3042",
+    "name": "晶技",
+    "market": "上市",
+    "close": 222.0,
+    "chgPct": -3.69,
+    "volume": 35475,
+    "value": 80.12,
+    "turnover": 10.34,
+    "rank": 19
+   },
+   {
+    "code": "6209",
+    "name": "今國光",
+    "market": "上市",
+    "close": 87.9,
+    "chgPct": 4.77,
+    "volume": 18484,
+    "value": 16.15,
+    "turnover": 10.16,
+    "rank": 20
+   }
+  ],
+  "上櫃": [
+   {
+    "code": "8111",
+    "name": "立碁",
+    "market": "上櫃",
+    "close": 94.3,
+    "chgPct": 9.91,
+    "volume": 37505,
+    "value": 34.01,
+    "turnover": 34.38,
+    "rank": 1
+   },
+   {
+    "code": "3441",
+    "name": "聯一光",
+    "market": "上櫃",
+    "close": 232.0,
+    "chgPct": 9.95,
+    "volume": 9599,
+    "value": 21.68,
+    "turnover": 23.97,
+    "rank": 2
+   },
+   {
+    "code": "3236",
+    "name": "千如",
+    "market": "上櫃",
+    "close": 53.5,
+    "chgPct": 0.19,
+    "volume": 24806,
+    "value": 13.64,
+    "turnover": 23.62,
+    "rank": 3
+   },
+   {
+    "code": "6207",
+    "name": "雷科",
+    "market": "上櫃",
+    "close": 152.0,
+    "chgPct": 2.7,
+    "volume": 17386,
+    "value": 25.99,
+    "turnover": 18.6,
+    "rank": 4
+   },
+   {
+    "code": "8358",
+    "name": "金居",
+    "market": "上櫃",
+    "close": 570.0,
+    "chgPct": 9.83,
+    "volume": 40410,
+    "value": 227.47,
+    "turnover": 16.0,
+    "rank": 5
+   },
+   {
+    "code": "3490",
+    "name": "單井",
+    "market": "上櫃",
+    "close": 46.15,
+    "chgPct": -8.97,
+    "volume": 8201,
+    "value": 3.91,
+    "turnover": 14.91,
+    "rank": 6
+   },
+   {
+    "code": "3455",
+    "name": "由田",
+    "market": "上櫃",
+    "close": 283.5,
+    "chgPct": 1.25,
+    "volume": 8634,
+    "value": 24.67,
+    "turnover": 14.43,
+    "rank": 7
+   },
+   {
+    "code": "6182",
+    "name": "合晶",
+    "market": "上櫃",
+    "close": 131.5,
+    "chgPct": -2.59,
+    "volume": 90831,
+    "value": 122.4,
+    "turnover": 14.25,
+    "rank": 8
+   },
+   {
+    "code": "3707",
+    "name": "漢磊",
+    "market": "上櫃",
+    "close": 85.3,
+    "chgPct": 0.12,
+    "volume": 55680,
+    "value": 49.28,
+    "turnover": 13.89,
+    "rank": 9
+   },
+   {
+    "code": "4908",
+    "name": "前鼎",
+    "market": "上櫃",
+    "close": 234.5,
+    "chgPct": 4.45,
+    "volume": 9825,
+    "value": 23.21,
+    "turnover": 12.56,
+    "rank": 10
+   },
+   {
+    "code": "5425",
+    "name": "台半",
+    "market": "上櫃",
+    "close": 105.5,
+    "chgPct": 3.43,
+    "volume": 33037,
+    "value": 36.02,
+    "turnover": 12.54,
+    "rank": 11
+   },
+   {
+    "code": "3624",
+    "name": "光頡",
+    "market": "上櫃",
+    "close": 145.5,
+    "chgPct": -2.02,
+    "volume": 14704,
+    "value": 22.02,
+    "turnover": 12.53,
+    "rank": 12
+   },
+   {
+    "code": "6199",
+    "name": "天品",
+    "market": "上櫃",
+    "close": 133.5,
+    "chgPct": 1.14,
+    "volume": 7650,
+    "value": 10.16,
+    "turnover": 12.39,
+    "rank": 13
+   },
+   {
+    "code": "1815",
+    "name": "富喬",
+    "market": "上櫃",
+    "close": 128.5,
+    "chgPct": 6.2,
+    "volume": 72517,
+    "value": 91.62,
+    "turnover": 11.8,
+    "rank": 14
+   },
+   {
+    "code": "8289",
+    "name": "泰藝",
+    "market": "上櫃",
+    "close": 57.2,
+    "chgPct": 1.96,
+    "volume": 7963,
+    "value": 4.73,
+    "turnover": 11.65,
+    "rank": 15
+   },
+   {
+    "code": "6419",
+    "name": "京晨科",
+    "market": "上櫃",
+    "close": 171.5,
+    "chgPct": 9.94,
+    "volume": 1473,
+    "value": 2.51,
+    "turnover": 11.19,
+    "rank": 16
+   },
+   {
+    "code": "3105",
+    "name": "穩懋",
+    "market": "上櫃",
+    "close": 615.0,
+    "chgPct": 4.06,
+    "volume": 47142,
+    "value": 290.88,
+    "turnover": 11.12,
+    "rank": 17
+   },
+   {
+    "code": "6127",
+    "name": "九豪",
+    "market": "上櫃",
+    "close": 57.8,
+    "chgPct": -1.03,
+    "volume": 11098,
+    "value": 6.5,
+    "turnover": 10.27,
+    "rank": 18
+   },
+   {
+    "code": "8086",
+    "name": "宏捷科",
+    "market": "上櫃",
+    "close": 129.0,
+    "chgPct": 7.5,
+    "volume": 18622,
+    "value": 23.67,
+    "turnover": 9.48,
+    "rank": 19
+   },
+   {
+    "code": "2061",
+    "name": "風青",
+    "market": "上櫃",
+    "close": 65.2,
+    "chgPct": -3.83,
+    "volume": 5388,
+    "value": 3.57,
+    "turnover": 9.39,
+    "rank": 20
+   }
+  ]
+ },
  "filters": {
   "minAvgLots": 1000,
   "minPrice": 10,

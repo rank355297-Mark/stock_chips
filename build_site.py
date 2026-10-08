@@ -95,10 +95,13 @@ def main():
                 "series": [px[p["code"]]["close"] if p["code"] in px else None for px in prices],
                 "tags": p["tags"] or ["法人買超"], "reason": reason(p),
             })
+        pick_codes = {p["code"] for p in doc["picks"]}
         days.append({"date": doc["date"], "seriesDates": [f"{d.month}/{d.day}" for d in tdays],
                      "tdccDate": doc["tdccDate"], "universe": doc["universe"],
                      "universeByMarket": doc.get("universeByMarket", {}),
-                     "marginPending": doc.get("marginPending", []), "picks": picks})
+                     "marginPending": doc.get("marginPending", []), "picks": picks,
+                     "turnover": [dict(x, sector=ind.get(x["code"], "其他"), inPicks=x["code"] in pick_codes)
+                                  for mk in ("上市", "上櫃") for x in doc.get("turnover", {}).get(mk, [])]})
     data = {"generatedAt": dt.datetime.now().strftime("%Y-%m-%d %H:%M"), "days": days}
 
     with open(os.path.join(BASE, "site_template.html"), encoding="utf-8") as f:

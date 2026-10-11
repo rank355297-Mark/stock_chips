@@ -152,6 +152,35 @@ def twse_shares():
     return out
 
 
+# 首頁要顯示的指數:(顯示名稱, 證交所指數名稱);證交所沒有「運輸類」,以航運類指數代表
+TWSE_INDICES = [("加權指數", "發行量加權股價指數"), ("航運", "航運類指數"), ("電子", "電子工業類指數"),
+                ("紡織", "紡織纖維類指數"), ("生技", "生技醫療類指數"), ("鋼鐵", "鋼鐵類指數"), ("造紙", "造紙類指數")]
+
+
+def market_indices(d):
+    """當日收盤指數:加權指數、櫃買指數與幾個類股指數。回傳 [{name, close, chg, chgPct}, ...]。"""
+    out = {}
+    j = cached_json(f"https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={d:%Y%m%d}&type=ALLBUT0999&response=json",
+                    f"twse_price_{d:%Y%m%d}.json")
+    if j:
+        idx = next((t for t in j["tables"] if t.get("fields") and t["fields"][0] == "指數"), {"data": []})
+        rows = {r[0].strip(): r for r in idx["data"]}
+        for short, full in TWSE_INDICES:
+            r = rows.get(full)
+            if r:
+                sign = -1 if "green" in r[2] or "-" in r[2] else 1
+                out[short] = {"name": short, "close": num(r[1]), "chg": round(sign * num(r[3]), 2), "chgPct": num(r[4])}
+    j = cached_json(f"https://www.tpex.org.tw/www/zh-tw/indexInfo/inx?date={d:%Y/%m/%d}&response=json",
+                    f"tpex_inx_{d:%Y%m%d}.json")
+    row = next((r for r in (j or {}).get("tables", [{}])[0].get("data", []) if r[0] == f"{d:%Y/%m/%d}"), None)
+    if row:
+        close, chg = num(row[4]), num(row[5])
+        out["櫃買指數"] = {"name": "櫃買指數", "close": close, "chg": chg,
+                       "chgPct": round(chg / (close - chg) * 100, 2) if close - chg else 0}
+    order = ["加權指數", "櫃買指數", "航運", "電子", "紡織", "生技", "鋼鐵", "造紙"]
+    return [out[k] for k in order if k in out]
+
+
 def daily_stock_rows(d):
     """當日上市、上櫃每檔普通股的行情與週轉率(成交股數 ÷ 已發行股數):{市場: [列, ...]}。"""
     result = {}
@@ -437,6 +466,7 @@ def main():
         "marginPending": sorted(margin_missing),
         "turnover": rank_by(day_rows, "turnover", TOP_N),
         "volumeRank": rank_by(day_rows, "volume", TOP_N),
+        "indices": market_indices(d0),
         "filters": {"minAvgLots": MIN_AVG_LOTS, "minPrice": MIN_PRICE, "lookback": LOOKBACK},
         "picks": picks,
     }
@@ -448,6 +478,7 @@ def main():
         print(x["market"], x["rank"], x["code"], x["name"], x["score"], x["instNet"], x["bigChg"], x["tags"])
     for mk, rows in doc["turnover"].items():
         print(f"週轉率 {mk} 前 3:", [(x["code"], x["name"], x["turnover"]) for x in rows[:3]])
+    print("指數:", [(x["name"], x["close"], x["chgPct"]) for x in doc["indices"]])
     for mk, rows in doc["volumeRank"].items():
         print(f"成交量 {mk} 前 3:", [(x["code"], x["name"], x["volume"]) for x in rows[:3]])
 

@@ -92,6 +92,12 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
         </div>
         <a href="#picks" class="bg-white text-black px-6 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">看今日推薦</a>
       </nav>
+      <!-- 每日收盤指數(跟著下方選取的日期) -->
+      <div class="liquid-glass rounded-xl mt-3 px-4 py-2" aria-label="每日收盤指數">
+        <div class="flex items-center gap-x-6 overflow-x-auto" id="indices">
+          <span class="text-xs text-gray-300 whitespace-nowrap" id="idxDate">收盤指數</span>
+        </div>
+      </div>
     </div>
 
     <div class="px-6 md:px-12 lg:px-16 flex-1 flex flex-col justify-end pb-12 lg:pb-16">
@@ -338,6 +344,21 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
       </div></td></tr>`).join("");
   }
 
+  // 首頁上方的指數列:加權、櫃買與類股指數
+  function renderIndices(day) {
+    const d = parseDay(day.date);
+    const items = (day.indices || []).map((x) => {
+      const c = cls(x.chg), arrow = x.chg > 0 ? "▲" : x.chg < 0 ? "▼" : "";
+      return `<div class="flex-none grid leading-tight py-1" title="${x.name} 收盤 ${fmt(x.close)}">
+        <span class="text-xs text-gray-300">${x.name}</span>
+        <span class="num text-sm font-medium">${x.close.toLocaleString("zh-TW", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+        <span class="num text-xs ${c}">${arrow}${Math.abs(x.chg).toFixed(2)} (${x.chgPct > 0 ? "+" : ""}${x.chgPct.toFixed(2)}%)</span>
+      </div>`;
+    }).join("");
+    $("indices").innerHTML = `<span class="flex-none text-xs text-gray-300 whitespace-nowrap">${d.getMonth() + 1}/${d.getDate()}<br>收盤</span>`
+      + (items || `<span class="text-xs text-gray-300">這一天沒有指數資料</span>`);
+  }
+
   function render() {
     if (!days.length) {
       $("list").innerHTML = `<div class="md:col-span-2 rounded-xl border border-dashed border-white/20 p-10 text-center text-gray-300">還沒有匯入推薦資料。請執行 build_site.py 產生網頁。</div>`;
@@ -380,6 +401,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
     $("sSector").textContent = topSec ? `${topSec[0]}(${topSec[1]} 檔)` : "—";
 
     RANKS.forEach((cfg) => renderRank(day, cfg));
+    renderIndices(day);
     $("list").innerHTML = rows.length ? rows.map((p) => card(p, day)).join("")
       : `<div class="md:col-span-2 rounded-xl border border-dashed border-white/20 p-10 text-center text-gray-300">這一天沒有${state.market}的推薦股,換個市場看看。</div>`;
   }

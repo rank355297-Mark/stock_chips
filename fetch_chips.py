@@ -212,6 +212,22 @@ def tdcc_latest():
     return date, out
 
 
+def tdcc_for(d0):
+    """取資料日期不晚於交易日 d0 的集保週資料,避免重算舊日期時用到之後才有的資料。
+    集保開放資料只提供最新一週,所以舊週別要靠之前存下的 cache/tdcc_YYYYMMDD.json。"""
+    date, out = tdcc_latest()
+    target = f"{d0:%Y%m%d}"
+    if date <= target:
+        return date, out
+    older = sorted(n[5:13] for n in os.listdir(CACHE)
+                   if re.fullmatch(r"tdcc_\d{8}\.json", n) and n[5:13] <= target)
+    if not older:
+        print(f"警告:找不到 {target} 以前的集保週資料,改用最新一週 {date}")
+        return date, out
+    with open(os.path.join(CACHE, f"tdcc_{older[-1]}.json"), encoding="utf-8") as f:
+        return older[-1], json.load(f)
+
+
 class TdccHistory:
     """集保網站「股權分散表查詢」,查單一股票指定週的千張大戶比例。"""
     URL = "https://www.tdcc.com.tw/portal/zh/smWeb/qryStock"
@@ -308,7 +324,7 @@ def main():
     mg, margin_missing = margins(d0)
     if margin_missing:
         print("融資融券尚未公布:", margin_missing, "→ 這一項暫不計分,晚上 9 點半後請重跑")
-    tdcc_date, big = tdcc_latest()
+    tdcc_date, big = tdcc_for(d0)
     print("集保資料日:", tdcc_date)
 
     today_inst, market = inst[0]

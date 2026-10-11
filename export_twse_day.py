@@ -1,14 +1,15 @@
 """把證交所某一天的盤後資料存成 CSV(Excel 可直接開),並印出重點摘要。
 
 用法: python export_twse_day.py 20261007
-輸出: twse_<日期>/ 收盤行情.csv、三大法人買賣超.csv、融資融券.csv、三大法人金額.csv
+輸出: twse_<日期>/ 收盤行情.csv、三大法人買賣超.csv、融資融券.csv、三大法人金額.csv、
+      成交量前20名.csv、週轉率前20名.csv(上市、上櫃各前 20 名普通股)
 """
 import csv
 import datetime as dt
 import os
 import sys
 
-from fetch_chips import cached_json, num
+from fetch_chips import TOP_N, cached_json, daily_stock_rows, num, rank_by
 
 d = dt.datetime.strptime(sys.argv[1], "%Y%m%d").date()
 base = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"twse_{d:%Y%m%d}")
@@ -46,6 +47,14 @@ mf = mtab["fields"]
 save("融資融券.csv", [f"融資{x}" if 2 <= i <= 7 else f"融券{x}" if 8 <= i <= 13 else x for i, x in enumerate(mf)], mtab["data"])
 if amt:
     save("三大法人金額.csv", amt["fields"], amt["data"])
+
+# 上市、上櫃普通股的成交量與週轉率排行(各前 20 名)
+day_rows = daily_stock_rows(d)
+for fname, key in (("成交量前20名.csv", "volume"), ("週轉率前20名.csv", "turnover")):
+    ranked = rank_by(day_rows, key, TOP_N)
+    save(fname, ["市場", "名次", "代號", "名稱", "收盤", "漲跌幅(%)", "成交量(張)", "成交金額(億)", "週轉率(%)"],
+         [[x["market"], x["rank"], x["code"], x["name"], x["close"], x["chgPct"], x["volume"], x["value"],
+           "" if x["turnover"] is None else x["turnover"]] for mk in ("上市", "上櫃") for x in ranked[mk]])
 
 # ---- 摘要 ----
 idx = next(t for t in price["tables"] if t.get("fields") and t["fields"][0] == "指數")

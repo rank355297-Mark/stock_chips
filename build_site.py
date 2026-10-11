@@ -100,8 +100,9 @@ def main():
                      "tdccDate": doc["tdccDate"], "universe": doc["universe"],
                      "universeByMarket": doc.get("universeByMarket", {}),
                      "marginPending": doc.get("marginPending", []), "picks": picks,
-                     "turnover": [dict(x, sector=ind.get(x["code"], "其他"), inPicks=x["code"] in pick_codes)
-                                  for mk in ("上市", "上櫃") for x in doc.get("turnover", {}).get(mk, [])]})
+                     **{key: [dict(x, sector=ind.get(x["code"], "其他"), inPicks=x["code"] in pick_codes)
+                              for mk in ("上市", "上櫃") for x in doc.get(key, {}).get(mk, [])]
+                        for key in ("turnover", "volumeRank")}})
     data = {"generatedAt": dt.datetime.now().strftime("%Y-%m-%d %H:%M"), "days": days}
 
     with open(os.path.join(BASE, "site_template.html"), encoding="utf-8") as f:

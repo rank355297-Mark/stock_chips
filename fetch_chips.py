@@ -152,25 +152,31 @@ def twse_shares():
     return out
 
 
-def turnover_rank(d, n=20):
-    """當日週轉率(成交股數 ÷ 已發行股數)排行,上市、上櫃各取前 n 名,只計普通股。"""
+def daily_stock_rows(d):
+    """當日上市、上櫃每檔普通股的行情與週轉率(成交股數 ÷ 已發行股數):{市場: [列, ...]}。"""
     result = {}
     for mk, prices, shares in (("上市", twse_price(d) or {}, twse_shares()),
                                ("上櫃", tpex_price(d) or {}, None)):
         rows = []
         for code, p in prices.items():
             sh = p.get("shares") if shares is None else shares.get(code)
-            if not is_common_stock(code) or not sh or not p["vol"] or not p["close"]:
+            if not is_common_stock(code) or not p["vol"] or not p["close"]:
                 continue
             prev = p["close"] - p["diff"]
             rows.append({"code": code, "name": p["name"], "market": mk, "close": p["close"],
                          "chgPct": round(p["diff"] / prev * 100, 2) if prev else 0,
                          "volume": round(p["vol"] / 1000), "value": round(p["value"] / 1e8, 2),
-                         "turnover": round(p["vol"] / sh * 100, 2)})
-        rows.sort(key=lambda x: -x["turnover"])
-        for i, x in enumerate(rows[:n], 1):
-            x["rank"] = i
-        result[mk] = rows[:n]
+                         "turnover": round(p["vol"] / sh * 100, 2) if sh else None})
+        result[mk] = rows
+    return result
+
+
+def rank_by(rows_by_market, key, n=20):
+    """依 key 由大到小排名,上市、上櫃各取前 n 名(key 為 None 的不列入)。"""
+    result = {}
+    for mk, rows in rows_by_market.items():
+        top = sorted((x for x in rows if x[key] is not None), key=lambda x: -x[key])[:n]
+        result[mk] = [dict(x, rank=i) for i, x in enumerate(top, 1)]
     return result
 
 
@@ -420,6 +426,7 @@ def main():
             tags.append("5日買超>均量")
         x["tags"] = tags
 
+    day_rows = daily_stock_rows(d0)   # 週轉率、成交量排行共用
     tw = lambda d: f"{d[:4]}-{d[4:6]}-{d[6:]}"
     doc = {
         "date": f"{d0:%Y-%m-%d}",
@@ -428,7 +435,8 @@ def main():
         "tdccDate": tw(tdcc_date), "tdccPrevDate": tw(prev_date) if prev_date else None,
         "universe": len(rows), "universeByMarket": universe, "topN": TOP_N, "weights": WEIGHTS,
         "marginPending": sorted(margin_missing),
-        "turnover": turnover_rank(d0, TOP_N),
+        "turnover": rank_by(day_rows, "turnover", TOP_N),
+        "volumeRank": rank_by(day_rows, "volume", TOP_N),
         "filters": {"minAvgLots": MIN_AVG_LOTS, "minPrice": MIN_PRICE, "lookback": LOOKBACK},
         "picks": picks,
     }
@@ -440,6 +448,8 @@ def main():
         print(x["market"], x["rank"], x["code"], x["name"], x["score"], x["instNet"], x["bigChg"], x["tags"])
     for mk, rows in doc["turnover"].items():
         print(f"週轉率 {mk} 前 3:", [(x["code"], x["name"], x["turnover"]) for x in rows[:3]])
+    for mk, rows in doc["volumeRank"].items():
+        print(f"成交量 {mk} 前 3:", [(x["code"], x["name"], x["volume"]) for x in rows[:3]])
 
 
 if __name__ == "__main__":

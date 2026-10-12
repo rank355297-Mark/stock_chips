@@ -71,6 +71,9 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
 .ring span { width: 44px; height: 44px; border-radius: 50%; background: #0b0b0b; display: grid; place-items: center; font-weight: 600; font-size: 15px; }
 .spark { width: 100%; max-width: 100%; height: auto; display: block; }
 .dates::-webkit-scrollbar { height: 4px; }
+/* 可左右滑動但不顯示捲軸(快捷連結、指數列) */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
 </style>
 
 <!-- ===== 主視覺 ===== -->
@@ -82,10 +85,10 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
     <div class="px-6 md:px-12 lg:px-16 pt-6">
       <nav class="liquid-glass rounded-xl px-4 py-2 flex items-center justify-between">
         <a href="#top" class="text-2xl font-semibold tracking-tight">每日選股</a>
-        <div class="hidden md:flex items-center gap-8 text-sm">
+        <div class="hidden lg:flex items-center gap-6 text-sm">
           <a href="#picks" class="transition-colors hover:text-gray-300">今日推薦</a>
           <a href="#history" class="transition-colors hover:text-gray-300">歷史清單</a>
-          <a href="#daytrade" class="transition-colors hover:text-gray-300">當沖熱門</a>
+          <a href="#daytrade" class="px-3 py-1 rounded-full bg-white text-black font-medium transition-colors hover:bg-gray-200">當沖熱門</a>
           <a href="#volume" class="transition-colors hover:text-gray-300">成交量</a>
           <a href="#turnover" class="transition-colors hover:text-gray-300">週轉率</a>
           <a href="#method" class="transition-colors hover:text-gray-300">評分方式</a>
@@ -93,9 +96,17 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
         </div>
         <a href="#picks" class="bg-white text-black px-6 py-2 rounded-lg text-sm font-medium transition-colors hover:bg-gray-100">看今日推薦</a>
       </nav>
+      <!-- 手機與平板的快捷連結(桌機改用導覽列) -->
+      <div class="lg:hidden mt-3 flex gap-2 overflow-x-auto no-scrollbar text-sm" aria-label="快速前往">
+        <a href="#daytrade" class="flex-none px-4 py-1.5 rounded-full bg-white text-black font-medium">當沖熱門</a>
+        <a href="#picks" class="flex-none liquid-glass border border-white/20 px-4 py-1.5 rounded-full">今日推薦</a>
+        <a href="#volume" class="flex-none liquid-glass border border-white/20 px-4 py-1.5 rounded-full">成交量</a>
+        <a href="#turnover" class="flex-none liquid-glass border border-white/20 px-4 py-1.5 rounded-full">週轉率</a>
+        <a href="#method" class="flex-none liquid-glass border border-white/20 px-4 py-1.5 rounded-full">評分方式</a>
+      </div>
       <!-- 每日收盤指數(跟著下方選取的日期) -->
       <div class="liquid-glass rounded-xl mt-3 px-4 py-2" aria-label="每日收盤指數">
-        <div class="flex items-center gap-x-6 overflow-x-auto" id="indices">
+        <div class="flex items-center gap-x-6 overflow-x-auto no-scrollbar" id="indices">
           <span class="text-xs text-gray-300 whitespace-nowrap" id="idxDate">收盤指數</span>
         </div>
       </div>
@@ -108,6 +119,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
           <p class="fade text-base md:text-lg text-gray-300 mb-5" data-delay="800" style="transition-duration: 1000ms">每個交易日盤後比對證交所與櫃買中心資料,依三大法人、千張大戶與融資變化計分,分別推薦上市 20 檔、上櫃 20 檔。</p>
           <div class="fade flex flex-wrap gap-4" data-delay="1200" style="transition-duration: 1000ms">
             <a href="#picks" class="bg-white text-black px-8 py-3 rounded-lg font-medium transition-colors hover:bg-gray-100">看今日推薦</a>
+            <a href="#daytrade" class="liquid-glass border border-white/20 text-white px-8 py-3 rounded-lg font-medium transition-colors hover:bg-white hover:text-black">當沖熱門標的</a>
             <a href="#method" class="liquid-glass border border-white/20 text-white px-8 py-3 rounded-lg font-medium transition-colors hover:bg-white hover:text-black">評分方式</a>
           </div>
         </div>

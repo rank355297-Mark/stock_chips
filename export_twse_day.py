@@ -2,14 +2,14 @@
 
 用法: python export_twse_day.py 20261007
 輸出: twse_<日期>/ 收盤行情.csv、三大法人買賣超.csv、融資融券.csv、三大法人金額.csv、
-      成交量前20名.csv、週轉率前20名.csv(上市、上櫃各前 20 名普通股)
+      成交量前20名.csv、週轉率前20名.csv(上市、上櫃各前 20 名普通股)、當沖做多20.csv、當沖做空20.csv
 """
 import csv
 import datetime as dt
 import os
 import sys
 
-from fetch_chips import TOP_N, cached_json, daily_stock_rows, num, rank_by
+from fetch_chips import TOP_N, cached_json, daily_stock_rows, daytrade_candidates, num, rank_by, trading_days
 
 d = dt.datetime.strptime(sys.argv[1], "%Y%m%d").date()
 base = os.path.join(os.path.dirname(os.path.abspath(__file__)), f"twse_{d:%Y%m%d}")
@@ -58,6 +58,15 @@ for fname, key in (("成交量前20名.csv", "volume"), ("週轉率前20名.csv"
     save(fname, ["市場", "名次", "代號", "名稱", "收盤", "漲跌幅(%)", "成交量(張)", "成交金額(億)", "週轉率(%)"],
          [[x["market"], x["rank"], x["code"], x["name"], x["close"], x["chgPct"], x["volume"], x["value"],
            "" if x["turnover"] is None else x["turnover"]] for mk in ("上市", "上櫃") for x in ranked[mk]])
+
+# 當沖熱門標的:做多、做空各 20 檔(上市櫃合併)
+dt_picks = daytrade_candidates(trading_days(d, 5), TOP_N)
+for fname, side in (("當沖做多20.csv", "long"), ("當沖做空20.csv", "short")):
+    save(fname, ["名次", "市場", "代號", "名稱", "分數", "收盤", "漲跌幅(%)", "成交量(張)", "週轉率(%)", "當沖比率(%)",
+                 "量增倍數", "收盤位置(%)", "三大法人(張)", "可先賣後買", "標籤", "理由"],
+         [[x["rank"], x["market"], x["code"], x["name"], x["score"], x["close"], x["chgPct"], x["volume"], x["turnover"],
+           x["dtRatio"], x["surge"], round(x["pos"] * 100), x["instNet"], "是" if x["shortable"] else "否",
+           "、".join(x["tags"]), x["reason"]] for x in dt_picks[side]])
 
 # ---- 摘要 ----
 idx = next(t for t in price["tables"] if t.get("fields") and t["fields"][0] == "指數")

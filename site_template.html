@@ -85,6 +85,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
         <div class="hidden md:flex items-center gap-8 text-sm">
           <a href="#picks" class="transition-colors hover:text-gray-300">今日推薦</a>
           <a href="#history" class="transition-colors hover:text-gray-300">歷史清單</a>
+          <a href="#daytrade" class="transition-colors hover:text-gray-300">當沖熱門</a>
           <a href="#volume" class="transition-colors hover:text-gray-300">成交量</a>
           <a href="#turnover" class="transition-colors hover:text-gray-300">週轉率</a>
           <a href="#method" class="transition-colors hover:text-gray-300">評分方式</a>
@@ -156,6 +157,43 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
     <div id="list" class="grid gap-4 md:grid-cols-2"></div>
   </div>
 </main>
+
+<!-- ===== 當沖熱門標的 ===== -->
+<section id="daytrade" class="px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
+  <div class="mx-auto max-w-6xl grid gap-6">
+    <div class="grid gap-3">
+      <p class="text-sm text-gray-400" id="dtAsof">盤後資料</p>
+      <h2 class="text-3xl md:text-4xl font-normal" style="letter-spacing: -0.03em" id="dtTitle">當沖熱門標的</h2>
+      <p class="text-sm text-gray-400 max-w-prose" id="dtDesc"></p>
+      <div class="flex flex-wrap items-center gap-3">
+        <div class="liquid-glass border border-white/20 rounded-lg p-1 inline-flex gap-1" role="group" aria-label="做多或做空">
+          <button type="button" id="dt-long" data-side="long" class="dts px-4 py-1.5 rounded-md text-sm">做多 20 檔</button>
+          <button type="button" id="dt-short" data-side="short" class="dts px-4 py-1.5 rounded-md text-sm">做空 20 檔</button>
+        </div>
+        <span class="text-xs text-gray-500">上市、上櫃合併排名,不受上方市場切換影響</span>
+      </div>
+    </div>
+    <div class="overflow-x-auto rounded-xl border border-white/20">
+      <table class="w-full text-sm min-w-[860px]">
+        <thead class="text-xs text-gray-400 text-left whitespace-nowrap">
+          <tr class="border-b border-white/20">
+            <th class="py-3 pl-4 pr-2 font-normal w-12">名次</th>
+            <th class="py-3 px-2 font-normal">股票與理由</th>
+            <th class="py-3 px-2 font-normal text-right">收盤</th>
+            <th class="py-3 px-2 font-normal text-right">漲跌幅</th>
+            <th class="py-3 px-2 font-normal text-right">週轉率</th>
+            <th class="py-3 px-2 font-normal text-right">當沖比率</th>
+            <th class="py-3 px-2 font-normal text-right">量增</th>
+            <th class="py-3 px-2 font-normal text-right">法人(張)</th>
+            <th class="py-3 pl-2 pr-4 font-normal text-right">分數</th>
+          </tr>
+        </thead>
+        <tbody id="dtRows" class="divide-y divide-white/10"></tbody>
+      </table>
+    </div>
+    <p class="text-xs text-gray-500 max-w-prose">「隔日沖賣壓」是用公開資料推估:當天上漲 5% 以上、成交量為前 4 日均量 2 倍以上、收在當日高點附近,但三大法人沒有買超。實際的隔日沖券商分點資料需要在證交所網站輸入驗證碼查詢,本站沒有使用。當沖風險很高,名單只是依規則篩選的參考,不是投資建議。</p>
+  </div>
+</section>
 
 <!-- ===== 成交量排行 ===== -->
 <section id="volume" class="px-6 md:px-12 lg:px-16 pb-16 lg:pb-24">
@@ -259,7 +297,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
     get(k) { try { return localStorage.getItem("picks-" + k); } catch (_) { return null; } },
     set(k, v) { try { localStorage.setItem("picks-" + k, v); } catch (_) {} },
   };
-  const state = { day: days.length ? days[0].date : null, market: store.get("market") || "上市", sort: store.get("sort") || "score" };
+  const state = { day: days.length ? days[0].date : null, market: store.get("market") || "上市", dtSide: store.get("dtSide") || "long", sort: store.get("sort") || "score" };
   const $ = (id) => document.getElementById(id);
   const fmt = (n) => n.toLocaleString("zh-TW");
   const cls = (n) => (n > 0 ? "up" : n < 0 ? "down" : "flat");
@@ -344,6 +382,42 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
       </div></td></tr>`).join("");
   }
 
+  // 當沖熱門標的:做多「強勢續攻」、做空「隔日沖賣壓」,各 20 檔
+  const DT_DESC = {
+    long: "做多「強勢續攻」:今天上漲、收在高點、三大法人有買超,而且量增、週轉率與當沖比率高的股票。分數 = 漲幅 20 + 收盤位置 15 + 法人買超佔成交量 20 + 量增 15 + 週轉率 20 + 當沖比率 10。",
+    short: "做空「隔日沖賣壓」:今天上漲但三大法人沒有買超,買盤多來自短線資金,隔天早盤常有獲利了結的賣壓。只列可以先賣後買的股票。分數 = 漲幅 20 + 收盤位置 10 + 法人越少買越高 20 + 量增 20 + 週轉率 20 + 當沖比率 10。",
+  };
+  function renderDayTrade(day) {
+    const d = parseDay(day.date);
+    $("dtAsof").textContent = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} 週${WEEK[d.getDay()]} 盤後篩選・供下一個交易日參考`;
+    $("dtTitle").textContent = `當沖熱門標的・${state.dtSide === "long" ? "做多" : "做空"} 20 檔`;
+    $("dtDesc").textContent = DT_DESC[state.dtSide];
+    document.querySelectorAll(".dts").forEach((b) => {
+      const on = b.dataset.side === state.dtSide;
+      b.setAttribute("aria-pressed", on);
+      b.className = `dts px-4 py-1.5 rounded-md text-sm transition-colors ${on ? "bg-white text-black" : "text-gray-300 hover:text-white"}`;
+    });
+    const rows = ((day.dayTrade || {})[state.dtSide]) || [];
+    if (!rows.length) {
+      $("dtRows").innerHTML = `<tr><td colspan="9" class="py-8 text-center text-gray-400">這一天沒有當沖標的資料。</td></tr>`;
+      return;
+    }
+    $("dtRows").innerHTML = rows.map((x) => `<tr class="align-top">
+      <td class="py-3 pl-4 pr-2 num text-gray-400">${x.rank}</td>
+      <td class="py-3 px-2 min-w-[300px]">
+        <div class="whitespace-nowrap"><span class="font-medium">${x.name}</span><span class="ml-2 text-xs text-gray-400 num">${x.code}</span>
+          <span class="ml-1 text-xs text-gray-500">${x.market}・${x.sector}</span></div>
+        <div class="flex flex-wrap gap-1 mt-1">${x.tags.map((t) => `<span class="text-[11px] px-2 py-0.5 rounded-full ${t === "隔日沖賣壓" ? "bg-white text-black" : "border border-white/20 text-gray-300"}">${t}</span>`).join("")}</div>
+        <div class="text-xs text-gray-400 mt-1 leading-relaxed">${x.reason}</div></td>
+      <td class="py-3 px-2 text-right num">${fmt(x.close)}</td>
+      <td class="py-3 px-2 text-right num ${cls(x.chgPct)}">${x.chgPct > 0 ? "+" : ""}${x.chgPct.toFixed(2)}%</td>
+      <td class="py-3 px-2 text-right num">${x.turnover.toFixed(2)}%</td>
+      <td class="py-3 px-2 text-right num">${x.dtRatio.toFixed(1)}%</td>
+      <td class="py-3 px-2 text-right num">${x.surge.toFixed(1)} 倍</td>
+      <td class="py-3 px-2 text-right num ${cls(x.instNet)}">${x.instNet > 0 ? "+" : ""}${fmt(x.instNet)}</td>
+      <td class="py-3 pl-2 pr-4 text-right num font-medium">${x.score.toFixed(1)}</td></tr>`).join("");
+  }
+
   // 首頁上方的指數列:加權、櫃買與類股指數
   function renderIndices(day) {
     const d = parseDay(day.date);
@@ -402,6 +476,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
 
     RANKS.forEach((cfg) => renderRank(day, cfg));
     renderIndices(day);
+    renderDayTrade(day);
     $("list").innerHTML = rows.length ? rows.map((p) => card(p, day)).join("")
       : `<div class="md:col-span-2 rounded-xl border border-dashed border-white/20 p-10 text-center text-gray-300">這一天沒有${state.market}的推薦股,換個市場看看。</div>`;
   }
@@ -412,6 +487,9 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
   });
   document.querySelectorAll(".mk").forEach((b) => b.addEventListener("click", () => {
     state.market = b.dataset.market; store.set("market", state.market); render();
+  }));
+  document.querySelectorAll(".dts").forEach((b) => b.addEventListener("click", () => {
+    state.dtSide = b.dataset.side; store.set("dtSide", state.dtSide); render();
   }));
   $("sortBy").addEventListener("change", (e) => { state.sort = e.target.value; store.set("sort", state.sort); render(); });
 

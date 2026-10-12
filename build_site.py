@@ -101,6 +101,8 @@ def main():
                      "universeByMarket": doc.get("universeByMarket", {}),
                      "marginPending": doc.get("marginPending", []), "picks": picks,
                      "indices": doc.get("indices", []),
+                     "dayTrade": {side: [dict(x, sector=ind.get(x["code"], "其他"))
+                                         for x in doc.get("dayTrade", {}).get(side, [])] for side in ("long", "short")},
                      **{key: [dict(x, sector=ind.get(x["code"], "其他"), inPicks=x["code"] in pick_codes)
                               for mk in ("上市", "上櫃") for x in doc.get(key, {}).get(mk, [])]
                         for key in ("turnover", "volumeRank")}})

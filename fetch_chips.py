@@ -145,7 +145,8 @@ def twse_price(d):
     for r in table["data"]:
         close = num(r[8])
         diff = num(r[10]) * (-1 if "-" in r[9] else 1)
-        out[r[0].strip()] = {"name": r[1].strip(), "vol": num(r[2]), "value": num(r[4]), "close": close, "diff": diff}
+        out[r[0].strip()] = {"name": r[1].strip(), "vol": num(r[2]), "value": num(r[4]), "close": close, "diff": diff,
+                             "open": num(r[5]), "high": num(r[6]), "low": num(r[7])}
     return out
 
 
@@ -157,7 +158,8 @@ def tpex_price(d):
     out = {}
     for r in j["tables"][0]["data"]:
         out[r[0].strip()] = {"name": r[1].strip(), "vol": num(r[7]), "value": num(r[8]), "close": num(r[2]),
-                             "diff": num(r[3]), "shares": num(r[14])}
+                             "diff": num(r[3]), "shares": num(r[14]),
+                             "open": num(r[4]), "high": num(r[5]), "low": num(r[6])}
     return out
 
 
@@ -220,6 +222,96 @@ def daily_stock_rows(d):
                          "turnover": round(p["vol"] / sh * 100, 2) if sh else None})
         result[mk] = rows
     return result
+
+
+def daytrade_list(d):
+    """證交所、櫃買中心「當日沖銷交易標的」:{代號: {"dtVol": 當沖成交股數, "noShortFirst": 暫停先賣後買}}。"""
+    out = {}
+    j = cached_json(f"https://www.twse.com.tw/rwd/zh/dayTrading/TWTB4U?date={d:%Y%m%d}&selectType=All&response=json",
+                    f"twse_daytrade_{d:%Y%m%d}.json")
+    for t in (j or {}).get("tables", []):
+        if t.get("fields") and t["fields"][0] == "證券代號":
+            for r in t["data"]:
+                out[r[0].strip()] = {"dtVol": num(r[3]), "noShortFirst": r[2].strip() == "Y"}
+    j = cached_json(f"https://www.tpex.org.tw/www/zh-tw/intraday/stat?type=Daily&date={d:%Y/%m/%d}&response=json",
+                    f"tpex_daytrade_{d:%Y%m%d}.json")
+    for t in (j or {}).get("tables", []):
+        if t.get("fields") and t["fields"][0] == "證券代號":
+            for r in t["data"]:
+                out[r[0].strip()] = {"dtVol": num(r[3]), "noShortFirst": r[2].strip() == "Y"}
+    return out
+
+
+DT_MIN_LOTS = 2000   # 當沖標的至少要有的當日成交量(張),太冷門的進出不易
+DT_WEIGHTS = {
+    # 做多「強勢續攻」:上漲、收在高點、三大法人有買、量增、週轉率與當沖熱度高
+    "long": {"chg": 20, "pos": 15, "inst": 20, "surge": 15, "turnover": 20, "dt": 10},
+    # 做空「隔日沖賣壓」:大漲爆量、週轉率高,但三大法人沒買(買盤來自短線資金),隔天早盤常有獲利了結賣壓
+    "short": {"chg": 20, "pos": 10, "inst": 20, "surge": 20, "turnover": 20, "dt": 10},
+}
+
+
+def daytrade_candidates(days, n=20):
+    """依交易日 days(新到舊)的最後一天資料,挑出當沖做多、做空各 n 檔(上市櫃合併排名)。"""
+    d0 = days[0]
+    today = daily_stock_rows(d0)
+    prices = [dict(tpex_price(d) or {}, **(twse_price(d) or {})) for d in days]
+    inst = dict(tpex_inst(d0) or {}, **(twse_inst(d0) or {}))
+    dt_list = daytrade_list(d0)
+    rows = []
+    for mk, lst in today.items():
+        for x in lst:
+            c, p = x["code"], prices[0].get(x["code"], {})
+            prev_vols = [px[c]["vol"] / 1000 for px in prices[1:] if c in px and px[c]["vol"]]
+            if c not in dt_list or x["volume"] < DT_MIN_LOTS or x["close"] < MIN_PRICE or x["turnover"] is None or not prev_vols:
+                continue
+            hi, lo = p.get("high", 0), p.get("low", 0)
+            inst_net = round(inst.get(c, {}).get("total", 0) / 1000)
+            rows.append(dict(x,
+                             dtRatio=round(dt_list[c]["dtVol"] / 1000 / x["volume"] * 100, 1),
+                             surge=round(x["volume"] / (sum(prev_vols) / len(prev_vols)), 2),
+                             pos=round((x["close"] - lo) / (hi - lo), 2) if hi > lo else 1.0,
+                             instNet=inst_net, instRatio=inst_net / x["volume"],
+                             shortable=not dt_list[c]["noShortFirst"]))
+    ranks = {k: pct_rank([x[f] for x in rows]) for k, f in
+             (("chg", "chgPct"), ("pos", "pos"), ("inst", "instRatio"), ("surge", "surge"), ("turnover", "turnover"), ("dt", "dtRatio"))}
+    for i, x in enumerate(rows):
+        r = {k: v[i] for k, v in ranks.items()}
+        wl, ws = DT_WEIGHTS["long"], DT_WEIGHTS["short"]
+        x["longScore"] = round(sum(r[k] * w for k, w in wl.items()), 1)
+        # 做空:法人買超越少越好(反向),其餘與做多同向
+        x["shortScore"] = round(sum((1 - r[k] if k == "inst" else r[k]) * w for k, w in ws.items()), 1)
+        x["nextDaySell"] = x["chgPct"] >= 5 and x["surge"] >= 2 and x["pos"] >= 0.8 and x["instNet"] <= 0
+
+    def tags(x, side):
+        t = []
+        if x["chgPct"] >= 9.5: t.append("漲停")
+        if x["nextDaySell"]: t.append("隔日沖賣壓")
+        if x["surge"] >= 2: t.append(f"爆量 {x['surge']:.1f} 倍")
+        if x["turnover"] >= 10: t.append("高週轉")
+        if x["dtRatio"] >= 40: t.append("當沖熱")
+        if side == "long" and x["pos"] >= 0.95: t.append("收最高")
+        if side == "long" and x["instNet"] > 0: t.append("法人買超")
+        if side == "short" and x["instNet"] < 0: t.append("法人賣超")
+        return t
+
+    def reason(x, side):
+        s = [f"漲跌 {x['chgPct']:+.2f}%,收盤位於當日區間 {x['pos'] * 100:.0f}%",
+             f"成交量為前 4 日均量的 {x['surge']:.1f} 倍,週轉率 {x['turnover']:.2f}%,當沖比率 {x['dtRatio']:.1f}%",
+             f"三大法人{'買超' if x['instNet'] >= 0 else '賣超'} {abs(x['instNet']):,} 張"]
+        return ";".join(s) + "。"
+
+    keep = ["code", "name", "market", "close", "chgPct", "volume", "value", "turnover", "dtRatio", "surge", "pos", "instNet", "shortable"]
+    # 做多:今天上漲且三大法人買超;做空:今天上漲、三大法人沒有買超,且可以先賣後買(漲越多分數越高)
+    long_pool = [x for x in rows if x["chgPct"] > 0 and x["instNet"] > 0]
+    short_pool = [x for x in rows if x["chgPct"] > 0 and x["instNet"] <= 0 and x["shortable"]]
+    out = {}
+    for side, pool, key in (("long", long_pool, "longScore"), ("short", short_pool, "shortScore")):
+        top = sorted(pool, key=lambda x: -x[key])[:n]
+        out[side] = [dict({k: x[k] for k in keep}, rank=i, score=x[key], tags=tags(x, side), reason=reason(x, side))
+                     for i, x in enumerate(top, 1)]
+    out["universe"] = len(rows)
+    return out
 
 
 def rank_by(rows_by_market, key, n=20):
@@ -489,6 +581,7 @@ def main():
         "turnover": rank_by(day_rows, "turnover", TOP_N),
         "volumeRank": rank_by(day_rows, "volume", TOP_N),
         "indices": market_indices(d0),
+        "dayTrade": daytrade_candidates(days, TOP_N),
         "filters": {"minAvgLots": MIN_AVG_LOTS, "minPrice": MIN_PRICE, "lookback": LOOKBACK},
         "picks": picks,
     }
@@ -501,6 +594,8 @@ def main():
     for mk, rows in doc["turnover"].items():
         print(f"週轉率 {mk} 前 3:", [(x["code"], x["name"], x["turnover"]) for x in rows[:3]])
     print("指數:", [(x["name"], x["close"], x["chgPct"]) for x in doc["indices"]])
+    for side, label in (("long", "當沖做多"), ("short", "當沖做空")):
+        print(f"{label} 前 5:", [(x["code"], x["name"], x["score"], x["tags"]) for x in doc["dayTrade"][side][:5]])
     for mk, rows in doc["volumeRank"].items():
         print(f"成交量 {mk} 前 3:", [(x["code"], x["name"], x["volume"]) for x in rows[:3]])
 

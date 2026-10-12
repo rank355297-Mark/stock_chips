@@ -8,6 +8,7 @@ import http.cookiejar
 import json
 import os
 import re
+import ssl
 import sys
 import time
 import urllib.parse
@@ -31,6 +32,16 @@ TDCC_CANDIDATES = 50    # 每個市場只對前 50 名候選股查集保上週�
 WEIGHTS = {"inst1": 25, "inst5": 25, "streak": 10, "big": 25, "margin": 15, "broker": 0}
 
 
+# 櫃買中心的憑證缺少 Authority Key Identifier 欄位,Python 3.13 的嚴格模式(VERIFY_X509_STRICT)會拒絕。
+# 只對櫃買中心關閉這項格式檢查,憑證鏈與主機名稱照常驗證;其他網站維持預設的嚴格檢查。
+TPEX_SSL = ssl.create_default_context()
+TPEX_SSL.verify_flags &= ~ssl.VERIFY_X509_STRICT
+
+
+def ssl_context(url):
+    return TPEX_SSL if urllib.parse.urlparse(url).hostname.endswith("tpex.org.tw") else None
+
+
 def http_get(url, cache_name=None, sleep=2.5):
     if cache_name:
         p = os.path.join(CACHE, cache_name)
@@ -38,7 +49,7 @@ def http_get(url, cache_name=None, sleep=2.5):
             with open(p, encoding="utf-8") as f:
                 return f.read()
     req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=90) as r:
+    with urllib.request.urlopen(req, timeout=90, context=ssl_context(url)) as r:
         raw = r.read()
     text = None
     for enc in ("utf-8-sig", "cp950"):

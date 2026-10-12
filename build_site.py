@@ -10,7 +10,7 @@ import os
 import time
 import urllib.request
 
-from fetch_chips import CACHE, tpex_price, twse_price
+from fetch_chips import CACHE, ssl_context, tpex_price, twse_price
 import datetime as dt
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -40,7 +40,7 @@ def industries():
         for attempt in range(3):
             try:
                 req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-                rows = json.loads(urllib.request.urlopen(req, timeout=90).read().decode("utf-8-sig"))
+                rows = json.loads(urllib.request.urlopen(req, timeout=90, context=ssl_context(url)).read().decode("utf-8-sig"))
                 for r in rows:
                     code = r.get("公司代號") or r.get("SecuritiesCompanyCode")
                     ind = r.get("產業別") or r.get("SecuritiesIndustryCode")

@@ -13,7 +13,7 @@
 | `site_template.html` | 推薦網頁的模板(`site_template_v1.html` 為舊版) |
 | `chips_radar.html` | 「籌碼雷達」網頁 |
 | `out/` | 每日推薦結果 |
-| `twse_YYYYMMDD/` | 證交所盤後資料 CSV,以及上市櫃成交量、週轉率前 20 名(目前有 10/07、10/08) |
+| `twse_YYYYMMDD/` | 證交所盤後資料 CSV,以及上市櫃成交量、週轉率前 20 名(目前有 10/07、10/08、10/12) |
 
 ## 使用方式
 

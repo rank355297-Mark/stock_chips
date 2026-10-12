@@ -36,15 +36,18 @@ margin = cached_json(f"https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?dat
                      f"twse_margin_{d:%Y%m%d}.json")
 amt = cached_json(f"https://www.twse.com.tw/rwd/zh/fund/BFI82U?type=day&dayDate={d:%Y%m%d}&response=json",
                   f"twse_bfi82u_{d:%Y%m%d}.json")
-if not (price and inst and margin):
+if not (price and inst):
     sys.exit("證交所這天沒有資料(可能是休市日,或盤後資料尚未公布)")
 
 ptab = next(t for t in price["tables"] if t.get("fields") and t["fields"][0] == "證券代號" and "收盤價" in t["fields"])
 save("收盤行情.csv", ptab["fields"], [clean(r) for r in ptab["data"]])
 save("三大法人買賣超.csv", inst["fields"], [[c.strip() for c in r] for r in inst["data"]])
-mtab = margin["tables"][1]
-mf = mtab["fields"]
-save("融資融券.csv", [f"融資{x}" if 2 <= i <= 7 else f"融券{x}" if 8 <= i <= 13 else x for i, x in enumerate(mf)], mtab["data"])
+if margin:
+    mtab = margin["tables"][1]
+    mf = mtab["fields"]
+    save("融資融券.csv", [f"融資{x}" if 2 <= i <= 7 else f"融券{x}" if 8 <= i <= 13 else x for i, x in enumerate(mf)], mtab["data"])
+else:
+    print("融資融券尚未公布(約晚上 9 點半),本次未輸出 融資融券.csv,公布後請重跑")
 if amt:
     save("三大法人金額.csv", amt["fields"], amt["data"])
 

@@ -74,12 +74,23 @@ def get_json(url, cache_name):
     return j if ok else None
 
 
+CACHE_FINAL_HOUR = 22  # 證交所、櫃買中心盤後資料當天稍晚仍可能更正,資料日 22:00 以後下載的才視為定稿
+
+
+def cache_is_final(path, cache_name):
+    m = re.search(r"_(\d{8})\.json$", cache_name)
+    if not m:
+        return True
+    final_at = dt.datetime.strptime(m.group(1), "%Y%m%d").replace(hour=CACHE_FINAL_HOUR)
+    return dt.datetime.fromtimestamp(os.path.getmtime(path)) >= final_at
+
+
 def cached_json(url, cache_name):
     p = os.path.join(CACHE, cache_name)
-    if os.path.exists(p):
+    if os.path.exists(p) and cache_is_final(p, cache_name):
         with open(p, encoding="utf-8") as f:
             return json.load(f)
-    return get_json(url, cache_name)
+    return get_json(url, cache_name)  # 沒有快取,或快取是當天較早的暫時版本:重新下載
 
 
 def num(s):

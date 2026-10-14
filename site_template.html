@@ -82,7 +82,13 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
     src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260403_050628_c4e32401-fab4-4a27-b7a8-6e9291cd5959.mp4"></video>
 
   <div class="relative z-10 flex h-full flex-col">
-    <div class="px-6 md:px-12 lg:px-16 pt-6">
+    <!-- 首頁最上方:重要聲明 -->
+    <div role="note" aria-label="重要聲明" class="bg-black/80 border-b border-white/15 px-6 md:px-12 lg:px-16 py-2 text-xs md:text-sm text-gray-300">
+      <span class="font-medium text-white">重要聲明</span>
+      本站非證券投資顧問事業,所有內容僅為公開資料的整理與規則篩選,不構成任何投資建議或買賣推薦,投資盈虧請自行負責。
+      <a href="#disclaimer" class="underline underline-offset-2 text-white whitespace-nowrap hover:text-gray-300">閱讀完整免責聲明</a>
+    </div>
+    <div class="px-6 md:px-12 lg:px-16 pt-4">
       <nav class="liquid-glass rounded-xl px-4 py-2 flex items-center justify-between">
         <a href="#top" class="text-2xl font-semibold tracking-tight">每日選股</a>
         <div class="hidden lg:flex items-center gap-6 text-sm">
@@ -103,6 +109,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
         <a href="#volume" class="flex-none liquid-glass border border-white/20 px-4 py-1.5 rounded-full">成交量</a>
         <a href="#turnover" class="flex-none liquid-glass border border-white/20 px-4 py-1.5 rounded-full">週轉率</a>
         <a href="#method" class="flex-none liquid-glass border border-white/20 px-4 py-1.5 rounded-full">評分方式</a>
+        <a href="#disclaimer" class="flex-none liquid-glass border border-white/20 px-4 py-1.5 rounded-full">免責聲明</a>
       </div>
       <!-- 每日收盤指數(跟著下方選取的日期) -->
       <div class="liquid-glass rounded-xl mt-3 px-4 py-2" aria-label="每日收盤指數">
@@ -285,7 +292,26 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
       <p class="text-sm text-gray-400" id="genAt"></p>
     </div>
   </div>
-  <p class="mx-auto max-w-6xl mt-12 text-xs text-gray-500">本站整理公開籌碼資料並排序,僅供研究參考,不構成任何投資建議。投資前請自行評估風險。</p>
+</section>
+
+<!-- ===== 免責聲明 ===== -->
+<section id="disclaimer" class="px-6 md:px-12 lg:px-16 pb-20">
+  <div class="mx-auto max-w-6xl border-t border-white/20 pt-12 grid gap-6">
+    <div class="grid gap-2">
+      <h2 class="text-2xl font-normal" style="letter-spacing: -0.03em">免責聲明</h2>
+      <p class="text-sm text-gray-400">使用本網站(以下稱「本站」)即表示您已閱讀、瞭解並同意下列條款。如不同意,請停止使用本站。</p>
+    </div>
+    <ol class="grid gap-4 text-sm text-gray-300 leading-relaxed max-w-prose list-decimal pl-5">
+      <li><span class="text-white font-medium">非投資顧問。</span>本站及其製作者並非依《證券投資信託及顧問法》經主管機關核准之證券投資顧問事業,亦未以任何方式收取費用或報酬。本站內容不屬於證券投資分析建議,亦非針對任何個人財務狀況所提供之意見。</li>
+      <li><span class="text-white font-medium">不構成要約或推薦。</span>本站所稱「推薦」、「做多」、「做空」、「當沖熱門標的」等名單,均為依公開資料與固定規則自動篩選、排序之結果,僅供研究與學習參考,不構成買賣任何有價證券之要約、招攬、建議或保證。</li>
+      <li><span class="text-white font-medium">資料來源與正確性。</span>本站資料取自臺灣證券交易所、證券櫃檯買賣中心、臺灣集中保管結算所之公開資訊,經程式整理計算而成。本站力求正確,但不保證資料之正確性、完整性與即時性;原始機構可能於公布後更正資料,一切以各機構官方公告為準。「隔日沖賣壓」等標籤為依公開資料之推估,並非實際券商分點交易資料。</li>
+      <li><span class="text-white font-medium">投資風險自負。</span>有價證券投資具有風險,價格可能上漲或下跌,投資人可能損失全部本金。當日沖銷、融資融券等信用交易之風險更高,可能產生超過本金之損失。過去表現不代表未來績效。投資人應審慎評估自身財務狀況與風險承受能力,必要時諮詢合格之專業顧問,並自行承擔一切投資決策之結果。</li>
+      <li><span class="text-white font-medium">責任限制。</span>對於任何人因使用或信賴本站內容、資料錯誤或遺漏、網站中斷或延遲所直接或間接產生之任何損失或損害,本站及其製作者在法律許可之最大範圍內,不負任何賠償責任。</li>
+      <li><span class="text-white font-medium">智慧財產權。</span>原始資料之權利屬於各資料提供機構。本站之版面設計與程式由製作者所有,未經同意不得用於商業用途。</li>
+      <li><span class="text-white font-medium">條款修改與準據法。</span>本站得隨時修改本聲明,修改後之內容自公布於本站時生效。本聲明之解釋與適用,以中華民國法律為準據法。</li>
+    </ol>
+    <p class="text-xs text-gray-500">最後更新:2026 年 10 月 14 日</p>
+  </div>
 </section>
 
 <script>

@@ -75,13 +75,18 @@ def get_json(url, cache_name):
 
 
 CACHE_FINAL_HOUR = 22  # 證交所、櫃買中心盤後資料當天稍晚仍可能更正,資料日 22:00 以後下載的才視為定稿
+DAYTRADE_FINAL_HOUR = 8  # 當沖統計更正得更晚(曾在 22:40 後仍有更正),隔天 08:00 以後下載的才視為定稿
 
 
 def cache_is_final(path, cache_name):
     m = re.search(r"_(\d{8})\.json$", cache_name)
     if not m:
         return True
-    final_at = dt.datetime.strptime(m.group(1), "%Y%m%d").replace(hour=CACHE_FINAL_HOUR)
+    day = dt.datetime.strptime(m.group(1), "%Y%m%d")
+    if "daytrade" in cache_name:
+        final_at = day + dt.timedelta(days=1, hours=DAYTRADE_FINAL_HOUR)
+    else:
+        final_at = day.replace(hour=CACHE_FINAL_HOUR)
     return dt.datetime.fromtimestamp(os.path.getmtime(path)) >= final_at
 
 
@@ -285,12 +290,15 @@ def daytrade_candidates(days, n=20):
 
     def tags(x, side):
         t = []
+        if x.get("thesis") == "弱勢續跌": t.append("弱勢續跌")
         if x["chgPct"] >= 9.5: t.append("漲停")
+        if x["chgPct"] <= -9.5: t.append("跌停")
         if x["nextDaySell"]: t.append("隔日沖賣壓")
         if x["surge"] >= 2: t.append(f"爆量 {x['surge']:.1f} 倍")
         if x["turnover"] >= 10: t.append("高週轉")
         if x["dtRatio"] >= 40: t.append("當沖熱")
         if side == "long" and x["pos"] >= 0.95: t.append("收最高")
+        if side == "short" and x.get("thesis") == "弱勢續跌" and x["pos"] <= 0.05: t.append("收最低")
         if side == "long" and x["instNet"] > 0: t.append("法人買超")
         if side == "short" and x["instNet"] < 0: t.append("法人賣超")
         return t
@@ -305,11 +313,24 @@ def daytrade_candidates(days, n=20):
     # 做多:今天上漲且三大法人買超;做空:今天上漲、三大法人沒有買超,且可以先賣後買(漲越多分數越高)
     long_pool = [x for x in rows if x["chgPct"] > 0 and x["instNet"] > 0]
     short_pool = [x for x in rows if x["chgPct"] > 0 and x["instNet"] <= 0 and x["shortable"]]
+    # 大跌日上漲股太少時,做空以「弱勢續跌」補足:下跌、收低、法人賣超、可先賣後買(計分與做多相反)
+    for i, x in enumerate(rows):
+        r = {k: v[i] for k, v in ranks.items()}
+        x["weakScore"] = round(sum((1 - r[k] if k in ("chg", "pos", "inst") else r[k]) * w
+                                   for k, w in DT_WEIGHTS["long"].items()), 1)
+    weak_pool = [x for x in rows if x["chgPct"] < 0 and x["instNet"] < 0 and x["shortable"]]
     out = {}
-    for side, pool, key in (("long", long_pool, "longScore"), ("short", short_pool, "shortScore")):
-        top = sorted(pool, key=lambda x: -x[key])[:n]
-        out[side] = [dict({k: x[k] for k in keep}, rank=i, score=x[key], tags=tags(x, side), reason=reason(x, side))
-                     for i, x in enumerate(top, 1)]
+    picks = {"long": [(x, x["longScore"], "強勢續攻") for x in sorted(long_pool, key=lambda x: -x["longScore"])[:n]]}
+    shorts = [(x, x["shortScore"], "隔日沖賣壓") for x in sorted(short_pool, key=lambda x: -x["shortScore"])[:n]]
+    if len(shorts) < n:
+        shorts += [(x, x["weakScore"], "弱勢續跌") for x in sorted(weak_pool, key=lambda x: -x["weakScore"])[:n - len(shorts)]]
+    picks["short"] = shorts
+    for side, lst in picks.items():
+        out[side] = []
+        for i, (x, score, thesis) in enumerate(lst, 1):
+            x["thesis"] = thesis
+            out[side].append(dict({k: x[k] for k in keep}, rank=i, score=score, thesis=thesis,
+                                  tags=tags(x, side), reason=reason(x, side)))
     out["universe"] = len(rows)
     return out
 

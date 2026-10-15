@@ -1,6 +1,6 @@
 {
  "date": "2026-10-13",
- "generatedAt": "2026-10-13T22:01+08:00",
+ "generatedAt": "2026-10-15T22:14+08:00",
  "tradingDays": [
   "2026-10-13",
   "2026-10-12",
@@ -991,6 +991,7 @@
     "shortable": true,
     "rank": 1,
     "score": 89.4,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "爆量 3.9 倍",
@@ -1017,6 +1018,7 @@
     "shortable": true,
     "rank": 2,
     "score": 88.8,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "爆量 3.2 倍",
@@ -1042,6 +1044,7 @@
     "shortable": true,
     "rank": 3,
     "score": 88.6,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "爆量 6.5 倍",
@@ -1067,6 +1070,7 @@
     "shortable": true,
     "rank": 4,
     "score": 86.6,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "爆量 2.2 倍",
@@ -1093,6 +1097,7 @@
     "shortable": true,
     "rank": 5,
     "score": 86.3,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "爆量 10.5 倍",
@@ -1118,6 +1123,7 @@
     "shortable": true,
     "rank": 6,
     "score": 86.2,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "爆量 2.9 倍",
@@ -1144,6 +1150,7 @@
     "shortable": true,
     "rank": 7,
     "score": 85.3,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "高週轉",
@@ -1169,6 +1176,7 @@
     "shortable": true,
     "rank": 8,
     "score": 83.8,
+    "thesis": "強勢續攻",
     "tags": [
      "爆量 4.2 倍",
      "當沖熱",
@@ -1193,6 +1201,7 @@
     "shortable": true,
     "rank": 9,
     "score": 83.4,
+    "thesis": "強勢續攻",
     "tags": [
      "爆量 3.5 倍",
      "高週轉",
@@ -1217,6 +1226,7 @@
     "shortable": true,
     "rank": 10,
     "score": 82.3,
+    "thesis": "強勢續攻",
     "tags": [
      "爆量 4.5 倍",
      "法人買超"
@@ -1239,6 +1249,7 @@
     "shortable": true,
     "rank": 11,
     "score": 82.2,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "爆量 8.5 倍",
@@ -1263,6 +1274,7 @@
     "shortable": true,
     "rank": 12,
     "score": 81.2,
+    "thesis": "強勢續攻",
     "tags": [
      "爆量 4.6 倍",
      "當沖熱",
@@ -1286,6 +1298,7 @@
     "shortable": true,
     "rank": 13,
     "score": 80.2,
+    "thesis": "強勢續攻",
     "tags": [
      "爆量 3.7 倍",
      "法人買超"
@@ -1308,6 +1321,7 @@
     "shortable": true,
     "rank": 14,
     "score": 80.1,
+    "thesis": "強勢續攻",
     "tags": [
      "爆量 6.4 倍",
      "高週轉",
@@ -1332,6 +1346,7 @@
     "shortable": true,
     "rank": 15,
     "score": 79.9,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "收最高",
@@ -1355,6 +1370,7 @@
     "shortable": true,
     "rank": 16,
     "score": 79.7,
+    "thesis": "強勢續攻",
     "tags": [
      "爆量 6.7 倍",
      "收最高",
@@ -1378,6 +1394,7 @@
     "shortable": true,
     "rank": 17,
     "score": 79.5,
+    "thesis": "強勢續攻",
     "tags": [
      "爆量 2.4 倍",
      "當沖熱",
@@ -1401,6 +1418,7 @@
     "shortable": true,
     "rank": 18,
     "score": 79.4,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "爆量 4.1 倍",
@@ -1426,6 +1444,7 @@
     "shortable": true,
     "rank": 19,
     "score": 78.4,
+    "thesis": "強勢續攻",
     "tags": [
      "爆量 9.2 倍",
      "高週轉",
@@ -1450,6 +1469,7 @@
     "shortable": true,
     "rank": 20,
     "score": 78.1,
+    "thesis": "強勢續攻",
     "tags": [
      "漲停",
      "當沖熱",
@@ -1476,6 +1496,7 @@
     "shortable": true,
     "rank": 1,
     "score": 87.0,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 4.3 倍",
      "當沖熱",
@@ -1499,6 +1520,7 @@
     "shortable": true,
     "rank": 2,
     "score": 86.9,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "漲停",
      "隔日沖賣壓",
@@ -1525,6 +1547,7 @@
     "shortable": true,
     "rank": 3,
     "score": 84.9,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 3.9 倍",
      "高週轉",
@@ -1549,6 +1572,7 @@
     "shortable": true,
     "rank": 4,
     "score": 84.3,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 4.3 倍",
      "當沖熱",
@@ -1572,6 +1596,7 @@
     "shortable": true,
     "rank": 5,
     "score": 83.9,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 5.6 倍",
      "當沖熱",
@@ -1595,6 +1620,7 @@
     "shortable": true,
     "rank": 6,
     "score": 83.4,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 2.5 倍",
      "高週轉",
@@ -1619,6 +1645,7 @@
     "shortable": true,
     "rank": 7,
     "score": 80.8,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 2.5 倍",
      "法人賣超"
@@ -1641,6 +1668,7 @@
     "shortable": true,
     "rank": 8,
     "score": 80.6,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 13.6 倍",
      "當沖熱",
@@ -1664,6 +1692,7 @@
     "shortable": true,
     "rank": 9,
     "score": 76.6,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "隔日沖賣壓",
      "爆量 2.0 倍",
@@ -1687,6 +1716,7 @@
     "shortable": true,
     "rank": 10,
     "score": 76.5,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 7.0 倍",
      "當沖熱",
@@ -1710,6 +1740,7 @@
     "shortable": true,
     "rank": 11,
     "score": 75.4,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 2.7 倍",
      "高週轉",
@@ -1734,6 +1765,7 @@
     "shortable": true,
     "rank": 12,
     "score": 75.4,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 4.7 倍",
      "當沖熱",
@@ -1757,6 +1789,7 @@
     "shortable": true,
     "rank": 13,
     "score": 75.1,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "高週轉",
      "當沖熱",
@@ -1780,6 +1813,7 @@
     "shortable": true,
     "rank": 14,
     "score": 75.1,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 3.4 倍",
      "高週轉",
@@ -1804,6 +1838,7 @@
     "shortable": true,
     "rank": 15,
     "score": 70.9,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
      "法人賣超"
@@ -1826,6 +1861,7 @@
     "shortable": true,
     "rank": 16,
     "score": 70.8,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 2.9 倍",
      "當沖熱",
@@ -1849,6 +1885,7 @@
     "shortable": true,
     "rank": 17,
     "score": 69.0,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
      "法人賣超"
@@ -1871,6 +1908,7 @@
     "shortable": true,
     "rank": 18,
     "score": 67.5,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "高週轉",
      "當沖熱",
@@ -1894,6 +1932,7 @@
     "shortable": true,
     "rank": 19,
     "score": 66.9,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
      "法人賣超"
@@ -1916,6 +1955,7 @@
     "shortable": true,
     "rank": 20,
     "score": 63.4,
+    "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 2.7 倍",
      "法人賣超"

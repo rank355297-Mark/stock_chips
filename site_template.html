@@ -423,7 +423,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
   // 當沖熱門標的:做多「強勢續攻」、做空「隔日沖賣壓」,各 20 檔
   const DT_DESC = {
     long: "做多「強勢續攻」:今天上漲、收在高點、三大法人有買超,而且量增、週轉率與當沖比率高的股票。分數 = 漲幅 20 + 收盤位置 15 + 法人買超佔成交量 20 + 量增 15 + 週轉率 20 + 當沖比率 10。",
-    short: "做空「隔日沖賣壓」:今天上漲但三大法人沒有買超,買盤多來自短線資金,隔天早盤常有獲利了結的賣壓。只列可以先賣後買的股票。分數 = 漲幅 20 + 收盤位置 10 + 法人越少買越高 20 + 量增 20 + 週轉率 20 + 當沖比率 10。",
+    short: "做空「隔日沖賣壓」:今天上漲但三大法人沒有買超,買盤多來自短線資金,隔天早盤常有獲利了結的賣壓。分數 = 漲幅 20 + 收盤位置 10 + 法人越少買越高 20 + 量增 20 + 週轉率 20 + 當沖比率 10。大跌日這類股票不足 20 檔時,以「弱勢續跌」補足:今天下跌、收在低點、三大法人賣超,分數 = 跌幅 20 + 收低 15 + 法人賣超佔量 20 + 量增 15 + 週轉率 20 + 當沖比率 10。只列可以先賣後買的股票。",
   };
   function renderDayTrade(day) {
     const d = parseDay(day.date);
@@ -445,7 +445,7 @@ a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid
       <td class="py-3 px-2 min-w-[300px]">
         <div class="whitespace-nowrap"><span class="font-medium">${x.name}</span><span class="ml-2 text-xs text-gray-400 num">${x.code}</span>
           <span class="ml-1 text-xs text-gray-500">${x.market}・${x.sector}</span></div>
-        <div class="flex flex-wrap gap-1 mt-1">${x.tags.map((t) => `<span class="text-[11px] px-2 py-0.5 rounded-full ${t === "隔日沖賣壓" ? "bg-white text-black" : "border border-white/20 text-gray-300"}">${t}</span>`).join("")}</div>
+        <div class="flex flex-wrap gap-1 mt-1">${x.tags.map((t) => `<span class="text-[11px] px-2 py-0.5 rounded-full ${t === "隔日沖賣壓" || t === "弱勢續跌" ? "bg-white text-black" : "border border-white/20 text-gray-300"}">${t}</span>`).join("")}</div>
         <div class="text-xs text-gray-400 mt-1 leading-relaxed">${x.reason}</div></td>
       <td class="py-3 px-2 text-right num">${fmt(x.close)}</td>
       <td class="py-3 px-2 text-right num ${cls(x.chgPct)}">${x.chgPct > 0 ? "+" : ""}${x.chgPct.toFixed(2)}%</td>

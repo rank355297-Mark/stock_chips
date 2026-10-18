@@ -4,6 +4,7 @@
 輸出: out/day_YYYY-MM-DD.json  (寫入網頁資料庫 days/<date> 的內容)
 """
 import datetime as dt
+import http.client
 import http.cookiejar
 import json
 import os
@@ -11,6 +12,7 @@ import re
 import ssl
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
@@ -21,6 +23,7 @@ os.makedirs(CACHE, exist_ok=True)
 os.makedirs(OUT, exist_ok=True)
 
 UA = {"User-Agent": "Mozilla/5.0"}
+HTTP_RETRIES = 5        # 網路不穩時每個網址最多嘗試的次數
 LOOKBACK = 5            # 法人累計與均量的交易日數
 MIN_AVG_LOTS = 1000     # 排除小型股:5 日均量至少 1000 張
 MIN_PRICE = 10          # 排除低價股
@@ -49,8 +52,18 @@ def http_get(url, cache_name=None, sleep=2.5):
             with open(p, encoding="utf-8") as f:
                 return f.read()
     req = urllib.request.Request(url, headers=UA)
-    with urllib.request.urlopen(req, timeout=90, context=ssl_context(url)) as r:
-        raw = r.read()
+    for attempt in range(1, HTTP_RETRIES + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=90, context=ssl_context(url)) as r:
+                raw = r.read()
+            break
+        except (urllib.error.URLError, TimeoutError, ConnectionError, http.client.IncompleteRead) as e:
+            # 網路暫時斷線、逾時或連線被中斷:等一下再試,最後一次仍失敗才放棄
+            if attempt == HTTP_RETRIES:
+                raise
+            wait = 15 * attempt
+            print(f"連線失敗({e}),{wait} 秒後重試第 {attempt + 1} 次:{url.split('?')[0]}", flush=True)
+            time.sleep(wait)
     text = None
     for enc in ("utf-8-sig", "cp950"):
         try:

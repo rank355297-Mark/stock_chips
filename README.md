@@ -9,11 +9,12 @@
 | `fetch_chips.py` | 抓取三大法人、收盤行情、融資融券、集保大戶資料並計算分數,輸出 `out/day_YYYY-MM-DD.json` |
 | `build_site.py` | 把 `out/` 的推薦結果嵌入 `site_template.html`,產生 `../vibe-site/index.html` |
 | `export_twse_day.py` | 把證交所某一天的盤後資料存成 CSV,並印出大盤與法人摘要 |
+| `verify_official.py` | 重新下載官方資料,核對 `out/` 的推薦股、成交量排行、指數與當沖名單是否一致 |
 | `index.html` | `build_site.py` 產生的推薦網頁(GitHub Pages 首頁) |
 | `site_template.html` | 推薦網頁的模板(`site_template_v1.html` 為舊版) |
 | `chips_radar.html` | 「籌碼雷達」網頁 |
 | `out/` | 每日推薦結果 |
-| `twse_YYYYMMDD/` | 證交所盤後資料 CSV,以及上市櫃成交量、週轉率前 20 名與當沖做多、做空 20 檔(目前有 10/07、10/08、10/12、10/13、10/14、10/15、10/16、10/19) |
+| `twse_YYYYMMDD/` | 證交所盤後資料 CSV,以及上市櫃成交量、週轉率前 20 名與當沖做多、做空 20 檔(目前有 10/07、10/08、10/12、10/13、10/14、10/15、10/16、10/19、10/20) |
 
 ## 使用方式
 
@@ -24,6 +25,7 @@ python fetch_chips.py            # 最近一個交易日
 python fetch_chips.py 20261007   # 指定日期
 python build_site.py             # 產生網頁
 python export_twse_day.py 20261007
+python verify_official.py 20261007  # 與官方資料核對(可一次給多個日期)
 ```
 
 融資融券資料約晚上 9 點半後公布,建議晚上或隔天早上執行;若尚未公布,融資項目暫不計分,網頁會標示。

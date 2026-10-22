@@ -1,6 +1,6 @@
 {
  "date": "2026-10-20",
- "generatedAt": "2026-10-22T23:35+08:00",
+ "generatedAt": "2026-10-22T23:44+08:00",
  "tradingDays": [
   "2026-10-20",
   "2026-10-19",
@@ -1017,7 +1017,7 @@
     "instNet": 2366,
     "shortable": true,
     "rank": 2,
-    "score": 90.6,
+    "score": 90.7,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 8.2 倍",
@@ -1042,7 +1042,7 @@
     "instNet": 1892,
     "shortable": true,
     "rank": 3,
-    "score": 88.5,
+    "score": 88.6,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 2.5 倍",
@@ -1066,7 +1066,7 @@
     "instNet": 346,
     "shortable": true,
     "rank": 4,
-    "score": 88.4,
+    "score": 88.5,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 4.3 倍",
@@ -1090,7 +1090,7 @@
     "instNet": 2664,
     "shortable": true,
     "rank": 5,
-    "score": 88.1,
+    "score": 88.3,
     "thesis": "強勢續攻",
     "tags": [
      "漲停",
@@ -1139,7 +1139,7 @@
     "instNet": 3105,
     "shortable": true,
     "rank": 7,
-    "score": 85.2,
+    "score": 85.3,
     "thesis": "強勢續攻",
     "tags": [
      "當沖熱",
@@ -1185,7 +1185,7 @@
     "instNet": 958,
     "shortable": true,
     "rank": 9,
-    "score": 84.7,
+    "score": 84.8,
     "thesis": "強勢續攻",
     "tags": [
      "漲停",
@@ -1211,7 +1211,7 @@
     "instNet": 200,
     "shortable": true,
     "rank": 10,
-    "score": 84.2,
+    "score": 84.3,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 5.0 倍",
@@ -1235,7 +1235,7 @@
     "instNet": 110,
     "shortable": true,
     "rank": 11,
-    "score": 83.8,
+    "score": 84.1,
     "thesis": "強勢續攻",
     "tags": [
      "漲停",
@@ -1262,7 +1262,7 @@
     "instNet": 911,
     "shortable": true,
     "rank": 12,
-    "score": 83.7,
+    "score": 83.8,
     "thesis": "強勢續攻",
     "tags": [
      "漲停",
@@ -1271,31 +1271,6 @@
      "法人買超"
     ],
     "reason": "漲跌 +9.90%,收盤位於當日區間 100%;成交量為前 4 日均量的 2.2 倍,週轉率 3.75%,當沖比率 33.2%;三大法人買超 911 張。"
-   },
-   {
-    "code": "6207",
-    "name": "雷科",
-    "market": "上櫃",
-    "close": 135.0,
-    "chgPct": 2.27,
-    "volume": 18246,
-    "value": 25.77,
-    "turnover": 19.52,
-    "dtRatio": 74.4,
-    "surge": 4.48,
-    "pos": 0.26,
-    "instNet": 224,
-    "shortable": true,
-    "rank": 13,
-    "score": 82.6,
-    "thesis": "強勢續攻",
-    "tags": [
-     "爆量 4.5 倍",
-     "高週轉",
-     "當沖熱",
-     "法人買超"
-    ],
-    "reason": "漲跌 +2.27%,收盤位於當日區間 26%;成交量為前 4 日均量的 4.5 倍,週轉率 19.52%,當沖比率 74.4%;三大法人買超 224 張。"
    },
    {
     "code": "6925",
@@ -1311,8 +1286,8 @@
     "pos": 1.0,
     "instNet": 81,
     "shortable": true,
-    "rank": 14,
-    "score": 82.6,
+    "rank": 13,
+    "score": 82.8,
     "thesis": "強勢續攻",
     "tags": [
      "漲停",
@@ -1322,6 +1297,31 @@
      "法人買超"
     ],
     "reason": "漲跌 +9.74%,收盤位於當日區間 100%;成交量為前 4 日均量的 1.0 倍,週轉率 11.76%,當沖比率 51.5%;三大法人買超 81 張。"
+   },
+   {
+    "code": "6207",
+    "name": "雷科",
+    "market": "上櫃",
+    "close": 135.0,
+    "chgPct": 2.27,
+    "volume": 18246,
+    "value": 25.77,
+    "turnover": 19.52,
+    "dtRatio": 74.4,
+    "surge": 4.48,
+    "pos": 0.26,
+    "instNet": 224,
+    "shortable": true,
+    "rank": 14,
+    "score": 82.6,
+    "thesis": "強勢續攻",
+    "tags": [
+     "爆量 4.5 倍",
+     "高週轉",
+     "當沖熱",
+     "法人買超"
+    ],
+    "reason": "漲跌 +2.27%,收盤位於當日區間 26%;成交量為前 4 日均量的 4.5 倍,週轉率 19.52%,當沖比率 74.4%;三大法人買超 224 張。"
    },
    {
     "code": "6174",
@@ -1338,7 +1338,7 @@
     "instNet": 121,
     "shortable": true,
     "rank": 15,
-    "score": 81.7,
+    "score": 81.8,
     "thesis": "強勢續攻",
     "tags": [
      "當沖熱",
@@ -1361,7 +1361,7 @@
     "instNet": 45,
     "shortable": true,
     "rank": 16,
-    "score": 81.5,
+    "score": 81.7,
     "thesis": "強勢續攻",
     "tags": [
      "漲停",
@@ -1386,39 +1386,13 @@
     "instNet": 688,
     "shortable": true,
     "rank": 17,
-    "score": 81.4,
+    "score": 81.5,
     "thesis": "強勢續攻",
     "tags": [
      "當沖熱",
      "法人買超"
     ],
     "reason": "漲跌 +2.41%,收盤位於當日區間 40%;成交量為前 4 日均量的 1.2 倍,週轉率 5.22%,當沖比率 54.9%;三大法人買超 688 張。"
-   },
-   {
-    "code": "6209",
-    "name": "今國光",
-    "market": "上市",
-    "close": 112.0,
-    "chgPct": 9.8,
-    "volume": 31114,
-    "value": 33.83,
-    "turnover": 17.11,
-    "dtRatio": 52.3,
-    "surge": 0.75,
-    "pos": 1.0,
-    "instNet": 2154,
-    "shortable": true,
-    "rank": 18,
-    "score": 80.9,
-    "thesis": "強勢續攻",
-    "tags": [
-     "漲停",
-     "高週轉",
-     "當沖熱",
-     "收最高",
-     "法人買超"
-    ],
-    "reason": "漲跌 +9.80%,收盤位於當日區間 100%;成交量為前 4 日均量的 0.8 倍,週轉率 17.11%,當沖比率 52.3%;三大法人買超 2,154 張。"
    },
    {
     "code": "3231",
@@ -1434,14 +1408,40 @@
     "pos": 0.75,
     "instNet": 42703,
     "shortable": true,
-    "rank": 19,
-    "score": 80.8,
+    "rank": 18,
+    "score": 80.9,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 2.2 倍",
      "法人買超"
     ],
     "reason": "漲跌 +5.00%,收盤位於當日區間 75%;成交量為前 4 日均量的 2.2 倍,週轉率 2.43%,當沖比率 30.5%;三大法人買超 42,703 張。"
+   },
+   {
+    "code": "6209",
+    "name": "今國光",
+    "market": "上市",
+    "close": 112.0,
+    "chgPct": 9.8,
+    "volume": 31114,
+    "value": 33.83,
+    "turnover": 17.11,
+    "dtRatio": 52.3,
+    "surge": 0.75,
+    "pos": 1.0,
+    "instNet": 2154,
+    "shortable": true,
+    "rank": 19,
+    "score": 80.9,
+    "thesis": "強勢續攻",
+    "tags": [
+     "漲停",
+     "高週轉",
+     "當沖熱",
+     "收最高",
+     "法人買超"
+    ],
+    "reason": "漲跌 +9.80%,收盤位於當日區間 100%;成交量為前 4 日均量的 0.8 倍,週轉率 17.11%,當沖比率 52.3%;三大法人買超 2,154 張。"
    },
    {
     "code": "1802",
@@ -1458,7 +1458,7 @@
     "instNet": 18618,
     "shortable": true,
     "rank": 20,
-    "score": 80.7,
+    "score": 80.8,
     "thesis": "強勢續攻",
     "tags": [
      "當沖熱",
@@ -1483,7 +1483,7 @@
     "instNet": -359,
     "shortable": true,
     "rank": 1,
-    "score": 86.0,
+    "score": 86.1,
     "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 5.9 倍",
@@ -1534,7 +1534,7 @@
     "instNet": -212,
     "shortable": true,
     "rank": 3,
-    "score": 81.4,
+    "score": 81.5,
     "thesis": "隔日沖賣壓",
     "tags": [
      "高週轉",
@@ -1558,7 +1558,7 @@
     "instNet": -333,
     "shortable": true,
     "rank": 4,
-    "score": 78.8,
+    "score": 78.9,
     "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 3.7 倍",
@@ -1582,7 +1582,7 @@
     "instNet": -1796,
     "shortable": true,
     "rank": 5,
-    "score": 78.2,
+    "score": 78.3,
     "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 3.8 倍",
@@ -1606,7 +1606,7 @@
     "instNet": -3103,
     "shortable": true,
     "rank": 6,
-    "score": 77.0,
+    "score": 77.1,
     "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 3.9 倍",
@@ -1654,7 +1654,7 @@
     "instNet": -27,
     "shortable": true,
     "rank": 8,
-    "score": 76.5,
+    "score": 76.6,
     "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 2.1 倍",
@@ -1702,7 +1702,7 @@
     "instNet": -629,
     "shortable": true,
     "rank": 10,
-    "score": 73.2,
+    "score": 73.3,
     "thesis": "隔日沖賣壓",
     "tags": [
      "高週轉",
@@ -1749,7 +1749,7 @@
     "instNet": -394,
     "shortable": true,
     "rank": 12,
-    "score": 70.3,
+    "score": 70.5,
     "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
@@ -1772,7 +1772,7 @@
     "instNet": -136,
     "shortable": true,
     "rank": 13,
-    "score": 70.2,
+    "score": 70.3,
     "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
@@ -1819,7 +1819,7 @@
     "instNet": -1259,
     "shortable": true,
     "rank": 15,
-    "score": 69.7,
+    "score": 69.8,
     "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
@@ -1842,7 +1842,7 @@
     "instNet": -387,
     "shortable": true,
     "rank": 16,
-    "score": 67.5,
+    "score": 67.6,
     "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
@@ -1941,7 +1941,7 @@
     "reason": "漲跌 +0.97%,收盤位於當日區間 40%;成交量為前 4 日均量的 0.8 倍,週轉率 0.40%,當沖比率 30.4%;三大法人賣超 574 張。"
    }
   ],
-  "universe": 314
+  "universe": 312
  },
  "filters": {
   "minAvgLots": 1000,

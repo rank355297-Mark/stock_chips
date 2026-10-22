@@ -277,12 +277,15 @@ def daytrade_candidates(days, n=20):
     prices = [dict(tpex_price(d) or {}, **(twse_price(d) or {})) for d in days]
     inst = dict(tpex_inst(d0) or {}, **(twse_inst(d0) or {}))
     dt_list = daytrade_list(d0)
+    big = cached_big_pct(d0)  # 千張大戶持股達 MAX_BIG_PCT 以上(公開收購、合併)的股票不列入
     rows = []
     for mk, lst in today.items():
         for x in lst:
             c, p = x["code"], prices[0].get(x["code"], {})
             prev_vols = [px[c]["vol"] / 1000 for px in prices[1:] if c in px and px[c]["vol"]]
             if c not in dt_list or x["volume"] < DT_MIN_LOTS or x["close"] < MIN_PRICE or x["turnover"] is None or not prev_vols:
+                continue
+            if big.get(c, 0) >= MAX_BIG_PCT:
                 continue
             hi, lo = p.get("high", 0), p.get("low", 0)
             inst_net = round(inst.get(c, {}).get("total", 0) / 1000)
@@ -396,6 +399,22 @@ def tdcc_latest():
     return date, out
 
 
+def cached_tdcc_weeks(d0):
+    """cache 裡資料日期不晚於 d0 的集保週別(由舊到新)。"""
+    target = f"{d0:%Y%m%d}"
+    return sorted(n[5:13] for n in os.listdir(CACHE)
+                  if re.fullmatch(r"tdcc_\d{8}\.json", n) and n[5:13] <= target)
+
+
+def cached_big_pct(d0):
+    """只讀 cache:不晚於 d0 的最新一週千張大戶持股 {代號: %}(沒有則回傳空 dict)。"""
+    weeks = cached_tdcc_weeks(d0)
+    if not weeks:
+        return {}
+    with open(os.path.join(CACHE, f"tdcc_{weeks[-1]}.json"), encoding="utf-8") as f:
+        return json.load(f)
+
+
 def tdcc_for(d0):
     """取資料日期不晚於交易日 d0 的集保週資料,避免重算舊日期時用到之後才有的資料。
     集保開放資料只提供最新一週,所以舊週別要靠之前存下的 cache/tdcc_YYYYMMDD.json。
@@ -403,8 +422,7 @@ def tdcc_for(d0):
     因此一律在「已存下的所有週別」中挑不晚於 d0 的最新一週,不直接採用開放資料當下的週別。"""
     date, out = tdcc_latest()  # 順便把開放資料目前的週別存進 cache
     target = f"{d0:%Y%m%d}"
-    weeks = sorted(n[5:13] for n in os.listdir(CACHE)
-                   if re.fullmatch(r"tdcc_\d{8}\.json", n) and n[5:13] <= target)
+    weeks = cached_tdcc_weeks(d0)
     if not weeks:
         print(f"警告:找不到 {target} 以前的集保週資料,改用開放資料目前的週別 {date}")
         return date, out

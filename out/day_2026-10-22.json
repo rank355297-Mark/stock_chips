@@ -1,6 +1,6 @@
 {
  "date": "2026-10-22",
- "generatedAt": "2026-10-22T23:34+08:00",
+ "generatedAt": "2026-10-22T23:43+08:00",
  "tradingDays": [
   "2026-10-22",
   "2026-10-21",
@@ -1041,7 +1041,7 @@
     "instNet": 2010,
     "shortable": true,
     "rank": 3,
-    "score": 88.9,
+    "score": 89.0,
     "thesis": "強勢續攻",
     "tags": [
      "漲停",
@@ -1067,7 +1067,7 @@
     "instNet": 881,
     "shortable": true,
     "rank": 4,
-    "score": 88.5,
+    "score": 88.6,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 6.6 倍",
@@ -1128,31 +1128,6 @@
     "reason": "漲跌 +3.66%,收盤位於當日區間 27%;成交量為前 4 日均量的 3.2 倍,週轉率 20.27%,當沖比率 65.1%;三大法人買超 7,942 張。"
    },
    {
-    "code": "6173",
-    "name": "信昌電",
-    "market": "上櫃",
-    "close": 293.5,
-    "chgPct": 3.16,
-    "volume": 22780,
-    "value": 69.28,
-    "turnover": 14.16,
-    "dtRatio": 64.2,
-    "surge": 2.3,
-    "pos": 0.16,
-    "instNet": 3792,
-    "shortable": true,
-    "rank": 7,
-    "score": 86.1,
-    "thesis": "強勢續攻",
-    "tags": [
-     "爆量 2.3 倍",
-     "高週轉",
-     "當沖熱",
-     "法人買超"
-    ],
-    "reason": "漲跌 +3.16%,收盤位於當日區間 16%;成交量為前 4 日均量的 2.3 倍,週轉率 14.16%,當沖比率 64.2%;三大法人買超 3,792 張。"
-   },
-   {
     "code": "4989",
     "name": "榮科",
     "market": "上市",
@@ -1166,8 +1141,8 @@
     "pos": 0.3,
     "instNet": 2340,
     "shortable": true,
-    "rank": 8,
-    "score": 85.5,
+    "rank": 7,
+    "score": 85.6,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 2.9 倍",
@@ -1191,8 +1166,8 @@
     "pos": 0.46,
     "instNet": 1215,
     "shortable": true,
-    "rank": 9,
-    "score": 84.7,
+    "rank": 8,
+    "score": 84.9,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 11.9 倍",
@@ -1215,8 +1190,8 @@
     "pos": 0.54,
     "instNet": 1510,
     "shortable": true,
-    "rank": 10,
-    "score": 84.0,
+    "rank": 9,
+    "score": 84.1,
     "thesis": "強勢續攻",
     "tags": [
      "高週轉",
@@ -1239,8 +1214,8 @@
     "pos": 0.82,
     "instNet": 167,
     "shortable": true,
-    "rank": 11,
-    "score": 82.6,
+    "rank": 10,
+    "score": 82.7,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 14.3 倍",
@@ -1248,6 +1223,31 @@
      "法人買超"
     ],
     "reason": "漲跌 +8.04%,收盤位於當日區間 82%;成交量為前 4 日均量的 14.3 倍,週轉率 3.86%,當沖比率 51.4%;三大法人買超 167 張。"
+   },
+   {
+    "code": "4960",
+    "name": "誠美材",
+    "market": "上市",
+    "close": 31.5,
+    "chgPct": 2.11,
+    "volume": 69209,
+    "value": 22.56,
+    "turnover": 12.11,
+    "dtRatio": 63.5,
+    "surge": 2.13,
+    "pos": 0.27,
+    "instNet": 2392,
+    "shortable": true,
+    "rank": 11,
+    "score": 82.6,
+    "thesis": "強勢續攻",
+    "tags": [
+     "爆量 2.1 倍",
+     "高週轉",
+     "當沖熱",
+     "法人買超"
+    ],
+    "reason": "漲跌 +2.11%,收盤位於當日區間 27%;成交量為前 4 日均量的 2.1 倍,週轉率 12.11%,當沖比率 63.5%;三大法人買超 2,392 張。"
    },
    {
     "code": "3406",
@@ -1264,38 +1264,13 @@
     "instNet": 535,
     "shortable": true,
     "rank": 12,
-    "score": 82.4,
+    "score": 82.5,
     "thesis": "強勢續攻",
     "tags": [
      "當沖熱",
      "法人買超"
     ],
     "reason": "漲跌 +1.75%,收盤位於當日區間 47%;成交量為前 4 日均量的 1.5 倍,週轉率 9.80%,當沖比率 71.4%;三大法人買超 535 張。"
-   },
-   {
-    "code": "4960",
-    "name": "誠美材",
-    "market": "上市",
-    "close": 31.5,
-    "chgPct": 2.11,
-    "volume": 69209,
-    "value": 22.56,
-    "turnover": 12.11,
-    "dtRatio": 63.5,
-    "surge": 2.13,
-    "pos": 0.27,
-    "instNet": 2392,
-    "shortable": true,
-    "rank": 13,
-    "score": 82.4,
-    "thesis": "強勢續攻",
-    "tags": [
-     "爆量 2.1 倍",
-     "高週轉",
-     "當沖熱",
-     "法人買超"
-    ],
-    "reason": "漲跌 +2.11%,收盤位於當日區間 27%;成交量為前 4 日均量的 2.1 倍,週轉率 12.11%,當沖比率 63.5%;三大法人買超 2,392 張。"
    },
    {
     "code": "7711",
@@ -1311,8 +1286,8 @@
     "pos": 0.21,
     "instNet": 354,
     "shortable": true,
-    "rank": 14,
-    "score": 81.3,
+    "rank": 13,
+    "score": 81.4,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 4.0 倍",
@@ -1335,8 +1310,8 @@
     "pos": 0.53,
     "instNet": 1198,
     "shortable": true,
-    "rank": 15,
-    "score": 80.6,
+    "rank": 14,
+    "score": 80.8,
     "thesis": "強勢續攻",
     "tags": [
      "當沖熱",
@@ -1358,8 +1333,8 @@
     "pos": 0.07,
     "instNet": 1365,
     "shortable": true,
-    "rank": 16,
-    "score": 80.4,
+    "rank": 15,
+    "score": 80.5,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 4.5 倍",
@@ -1383,7 +1358,7 @@
     "pos": 0.78,
     "instNet": 33359,
     "shortable": true,
-    "rank": 17,
+    "rank": 16,
     "score": 76.1,
     "thesis": "強勢續攻",
     "tags": [
@@ -1406,8 +1381,8 @@
     "pos": 0.48,
     "instNet": 775,
     "shortable": true,
-    "rank": 18,
-    "score": 73.6,
+    "rank": 17,
+    "score": 73.7,
     "thesis": "強勢續攻",
     "tags": [
      "當沖熱",
@@ -1429,8 +1404,8 @@
     "pos": 0.71,
     "instNet": 610,
     "shortable": true,
-    "rank": 19,
-    "score": 73.2,
+    "rank": 18,
+    "score": 73.3,
     "thesis": "強勢續攻",
     "tags": [
      "爆量 2.1 倍",
@@ -1452,7 +1427,7 @@
     "pos": 0.31,
     "instNet": 2448,
     "shortable": true,
-    "rank": 20,
+    "rank": 19,
     "score": 72.5,
     "thesis": "強勢續攻",
     "tags": [
@@ -1460,6 +1435,29 @@
      "法人買超"
     ],
     "reason": "漲跌 +1.46%,收盤位於當日區間 31%;成交量為前 4 日均量的 3.0 倍,週轉率 1.15%,當沖比率 25.1%;三大法人買超 2,448 張。"
+   },
+   {
+    "code": "6199",
+    "name": "天品",
+    "market": "上櫃",
+    "close": 149.5,
+    "chgPct": 1.01,
+    "volume": 7365,
+    "value": 10.97,
+    "turnover": 11.93,
+    "dtRatio": 17.9,
+    "surge": 1.31,
+    "pos": 0.83,
+    "instNet": 57,
+    "shortable": true,
+    "rank": 20,
+    "score": 72.2,
+    "thesis": "強勢續攻",
+    "tags": [
+     "高週轉",
+     "法人買超"
+    ],
+    "reason": "漲跌 +1.01%,收盤位於當日區間 83%;成交量為前 4 日均量的 1.3 倍,週轉率 11.93%,當沖比率 17.9%;三大法人買超 57 張。"
    }
   ],
   "short": [
@@ -1478,7 +1476,7 @@
     "instNet": -516,
     "shortable": true,
     "rank": 1,
-    "score": 85.3,
+    "score": 85.4,
     "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 5.6 倍",
@@ -1502,7 +1500,7 @@
     "instNet": -548,
     "shortable": true,
     "rank": 2,
-    "score": 83.4,
+    "score": 83.5,
     "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
@@ -1525,7 +1523,7 @@
     "instNet": -869,
     "shortable": true,
     "rank": 3,
-    "score": 83.3,
+    "score": 83.4,
     "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 6.0 倍",
@@ -1549,7 +1547,7 @@
     "instNet": -1086,
     "shortable": true,
     "rank": 4,
-    "score": 82.2,
+    "score": 82.3,
     "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 7.1 倍",
@@ -1621,7 +1619,7 @@
     "instNet": -548,
     "shortable": true,
     "rank": 7,
-    "score": 77.1,
+    "score": 77.2,
     "thesis": "隔日沖賣壓",
     "tags": [
      "爆量 3.1 倍",
@@ -1645,7 +1643,7 @@
     "instNet": -417,
     "shortable": true,
     "rank": 8,
-    "score": 74.6,
+    "score": 74.7,
     "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
@@ -1668,7 +1666,7 @@
     "instNet": -74,
     "shortable": true,
     "rank": 9,
-    "score": 74.4,
+    "score": 74.6,
     "thesis": "隔日沖賣壓",
     "tags": [
      "當沖熱",
@@ -1691,7 +1689,7 @@
     "instNet": -302,
     "shortable": true,
     "rank": 10,
-    "score": 71.2,
+    "score": 71.3,
     "thesis": "隔日沖賣壓",
     "tags": [
      "法人賣超"
@@ -1713,7 +1711,7 @@
     "instNet": -285,
     "shortable": true,
     "rank": 11,
-    "score": 54.8,
+    "score": 54.9,
     "thesis": "隔日沖賣壓",
     "tags": [
      "法人賣超"
@@ -1789,7 +1787,7 @@
     "instNet": -1284,
     "shortable": true,
     "rank": 14,
-    "score": 84.9,
+    "score": 85.0,
     "thesis": "弱勢續跌",
     "tags": [
      "弱勢續跌",
@@ -1869,7 +1867,7 @@
     "instNet": -297,
     "shortable": true,
     "rank": 17,
-    "score": 80.6,
+    "score": 80.7,
     "thesis": "弱勢續跌",
     "tags": [
      "弱勢續跌",
@@ -1948,7 +1946,7 @@
     "instNet": -1015,
     "shortable": true,
     "rank": 20,
-    "score": 77.7,
+    "score": 77.8,
     "thesis": "弱勢續跌",
     "tags": [
      "弱勢續跌",
@@ -1959,7 +1957,7 @@
     "reason": "漲跌 -9.91%,收盤位於當日區間 0%;成交量為前 4 日均量的 1.3 倍,週轉率 4.05%,當沖比率 23.7%;三大法人賣超 1,015 張。"
    }
   ],
-  "universe": 339
+  "universe": 338
  },
  "filters": {
   "minAvgLots": 1000,

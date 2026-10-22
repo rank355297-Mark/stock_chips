@@ -27,6 +27,7 @@ HTTP_RETRIES = 5        # 網路不穩時每個網址最多嘗試的次數
 LOOKBACK = 5            # 法人累計與均量的交易日數
 MIN_AVG_LOTS = 1000     # 排除小型股:5 日均量至少 1000 張
 MIN_PRICE = 10          # 排除低價股
+MAX_BIG_PCT = 99        # 千張大戶持股達 99% 以上(多為公開收購或合併完成,幾乎無流通籌碼)不列入推薦
 MARKETS = ("上市", "上櫃")
 TOP_N = 20              # 上市、上櫃各推薦 20 檔
 TDCC_CANDIDATES = 50    # 每個市場只對前 50 名候選股查集保上週資料
@@ -397,18 +398,20 @@ def tdcc_latest():
 
 def tdcc_for(d0):
     """取資料日期不晚於交易日 d0 的集保週資料,避免重算舊日期時用到之後才有的資料。
-    集保開放資料只提供最新一週,所以舊週別要靠之前存下的 cache/tdcc_YYYYMMDD.json。"""
-    date, out = tdcc_latest()
+    集保開放資料只提供最新一週,所以舊週別要靠之前存下的 cache/tdcc_YYYYMMDD.json。
+    開放資料偶爾會退回較舊的週別(曾在已公布 10/16 週後又回傳 10/08 週),
+    因此一律在「已存下的所有週別」中挑不晚於 d0 的最新一週,不直接採用開放資料當下的週別。"""
+    date, out = tdcc_latest()  # 順便把開放資料目前的週別存進 cache
     target = f"{d0:%Y%m%d}"
-    if date <= target:
-        return date, out
-    older = sorted(n[5:13] for n in os.listdir(CACHE)
+    weeks = sorted(n[5:13] for n in os.listdir(CACHE)
                    if re.fullmatch(r"tdcc_\d{8}\.json", n) and n[5:13] <= target)
-    if not older:
-        print(f"警告:找不到 {target} 以前的集保週資料,改用最新一週 {date}")
+    if not weeks:
+        print(f"警告:找不到 {target} 以前的集保週資料,改用開放資料目前的週別 {date}")
         return date, out
-    with open(os.path.join(CACHE, f"tdcc_{older[-1]}.json"), encoding="utf-8") as f:
-        return older[-1], json.load(f)
+    if weeks[-1] != date:
+        print(f"集保開放資料目前是 {date} 週,改用已存下、不晚於交易日的最新一週 {weeks[-1]}")
+    with open(os.path.join(CACHE, f"tdcc_{weeks[-1]}.json"), encoding="utf-8") as f:
+        return weeks[-1], json.load(f)
 
 
 class TdccHistory:
@@ -519,6 +522,9 @@ def main():
         avg_vol = sum(vols) / len(vols)
         close = price[0][code]["close"]
         if avg_vol < MIN_AVG_LOTS or close < MIN_PRICE:
+            continue
+        if big.get(code) is not None and big[code] >= MAX_BIG_PCT:
+            print(f"排除 {code}:千張大戶持股 {big[code]}%,幾乎沒有流通籌碼")
             continue
         hist = [inst[k][0].get(code, {}).get("total", 0) / 1000 for k in range(len(days))]
         f_hist = [inst[k][0].get(code, {}).get("foreign", 0) for k in range(len(days))]

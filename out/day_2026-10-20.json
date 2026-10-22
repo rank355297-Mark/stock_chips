@@ -1,6 +1,6 @@
 {
  "date": "2026-10-20",
- "generatedAt": "2026-10-21T21:34+08:00",
+ "generatedAt": "2026-10-22T23:35+08:00",
  "tradingDays": [
   "2026-10-20",
   "2026-10-19",
@@ -10,10 +10,10 @@
  ],
  "tdccDate": "2026-10-16",
  "tdccPrevDate": "2026-10-08",
- "universe": 551,
+ "universe": 549,
  "universeByMarket": {
-  "上市": 405,
-  "上櫃": 146
+  "上市": 404,
+  "上櫃": 145
  },
  "topN": 20,
  "weights": {
@@ -1926,19 +1926,19 @@
     "chgPct": 0.97,
     "volume": 5393,
     "value": 11.28,
-    "turnover": 0.42,
+    "turnover": 0.4,
     "dtRatio": 30.4,
     "surge": 0.81,
     "pos": 0.4,
     "instNet": -574,
     "shortable": true,
     "rank": 20,
-    "score": 55.2,
+    "score": 55.0,
     "thesis": "隔日沖賣壓",
     "tags": [
      "法人賣超"
     ],
-    "reason": "漲跌 +0.97%,收盤位於當日區間 40%;成交量為前 4 日均量的 0.8 倍,週轉率 0.42%,當沖比率 30.4%;三大法人賣超 574 張。"
+    "reason": "漲跌 +0.97%,收盤位於當日區間 40%;成交量為前 4 日均量的 0.8 倍,週轉率 0.40%,當沖比率 30.4%;三大法人賣超 574 張。"
    }
   ],
   "universe": 314
@@ -2200,13 +2200,13 @@
    "brokerNet": null,
    "parts": {
     "inst1": 23.5,
-    "inst5": 18.3,
+    "inst5": 18.2,
     "streak": 6.3,
     "margin": 14.4,
     "big": 23.6,
     "broker": 0
    },
-   "score": 86.1,
+   "score": 86.0,
    "rank": 6,
    "tags": [
     "大戶增持",
@@ -2547,14 +2547,14 @@
    "bigChg": 1.21,
    "brokerNet": null,
    "parts": {
-    "inst1": 16.8,
+    "inst1": 16.9,
     "inst5": 21.6,
     "streak": 6.0,
     "margin": 13.4,
     "big": 25,
     "broker": 0
    },
-   "score": 82.8,
+   "score": 82.9,
    "rank": 14,
    "tags": [
     "大戶增持",
@@ -2724,11 +2724,11 @@
     "inst1": 22.3,
     "inst5": 23.3,
     "streak": 8.4,
-    "margin": 8.4,
+    "margin": 8.3,
     "big": 17.1,
     "broker": 0
    },
-   "score": 79.5,
+   "score": 79.4,
    "rank": 18,
    "tags": [
     "外資連買5日",
@@ -2764,14 +2764,14 @@
    "bigChg": 0.48,
    "brokerNet": null,
    "parts": {
-    "inst1": 23.5,
+    "inst1": 23.4,
     "inst5": 19.3,
     "streak": 4.3,
     "margin": 13.8,
     "big": 18.5,
     "broker": 0
    },
-   "score": 79.4,
+   "score": 79.3,
    "rank": 19,
    "tags": []
   },
@@ -2848,13 +2848,13 @@
    "brokerNet": null,
    "parts": {
     "inst1": 23.4,
-    "inst5": 19.5,
+    "inst5": 19.4,
     "streak": 10.0,
     "margin": 11.9,
     "big": 25,
     "broker": 0
    },
-   "score": 89.8,
+   "score": 89.7,
    "rank": 1,
    "tags": [
     "投信連買5日",
@@ -2892,12 +2892,12 @@
    "parts": {
     "inst1": 22.9,
     "inst5": 23.6,
-    "streak": 8.7,
+    "streak": 8.6,
     "margin": 14.5,
     "big": 19.8,
     "broker": 0
    },
-   "score": 89.5,
+   "score": 89.4,
    "rank": 2,
    "tags": [
     "外資連買3日",
@@ -2977,14 +2977,14 @@
    "bigChg": 0.66,
    "brokerNet": null,
    "parts": {
-    "inst1": 22.8,
+    "inst1": 22.7,
     "inst5": 25.0,
     "streak": 5.4,
-    "margin": 13.7,
+    "margin": 13.6,
     "big": 20.8,
     "broker": 0
    },
-   "score": 87.7,
+   "score": 87.5,
    "rank": 4,
    "tags": [
     "大戶增持",
@@ -3024,11 +3024,11 @@
     "inst1": 23.1,
     "inst5": 24.8,
     "streak": 9.2,
-    "margin": 8.7,
+    "margin": 8.6,
     "big": 21.5,
     "broker": 0
    },
-   "score": 87.3,
+   "score": 87.2,
    "rank": 5,
    "tags": [
     "大戶增持",
@@ -3109,13 +3109,13 @@
    "brokerNet": null,
    "parts": {
     "inst1": 21.4,
-    "inst5": 16.2,
+    "inst5": 16.1,
     "streak": 7.4,
     "margin": 14.3,
     "big": 25,
     "broker": 0
    },
-   "score": 84.3,
+   "score": 84.2,
    "rank": 7,
    "tags": [
     "大戶增持",
@@ -3235,12 +3235,12 @@
    "parts": {
     "inst1": 24.1,
     "inst5": 21.2,
-    "streak": 8.7,
+    "streak": 8.6,
     "margin": 14.1,
     "big": 12.5,
     "broker": 0
    },
-   "score": 80.6,
+   "score": 80.5,
    "rank": 10,
    "tags": [
     "外資連買3日",
@@ -3320,12 +3320,12 @@
    "parts": {
     "inst1": 16.7,
     "inst5": 18.1,
-    "streak": 8.7,
+    "streak": 8.6,
     "margin": 9.7,
     "big": 25,
     "broker": 0
    },
-   "score": 78.2,
+   "score": 78.1,
    "rank": 12,
    "tags": [
     "外資連買3日",
@@ -3405,13 +3405,13 @@
    "brokerNet": null,
    "parts": {
     "inst1": 24.3,
-    "inst5": 20.9,
+    "inst5": 20.8,
     "streak": 5.4,
     "margin": 13.8,
     "big": 12.8,
     "broker": 0
    },
-   "score": 77.2,
+   "score": 77.1,
    "rank": 14,
    "tags": [
     "融資大減"
@@ -3449,11 +3449,11 @@
     "inst1": 23.6,
     "inst5": 22.9,
     "streak": 9.6,
-    "margin": 8.1,
+    "margin": 8.0,
     "big": 12.5,
     "broker": 0
    },
-   "score": 76.7,
+   "score": 76.6,
    "rank": 15,
    "tags": [
     "外資連買5日"
@@ -3570,14 +3570,14 @@
    "bigChg": 0.16,
    "brokerNet": null,
    "parts": {
-    "inst1": 20.2,
+    "inst1": 20.1,
     "inst5": 23.1,
     "streak": 9.8,
-    "margin": 7.9,
+    "margin": 7.8,
     "big": 14.5,
     "broker": 0
    },
-   "score": 75.5,
+   "score": 75.3,
    "rank": 18,
    "tags": [
     "外資連買3日"
@@ -3654,14 +3654,14 @@
    "bigChg": 0.0,
    "brokerNet": null,
    "parts": {
-    "inst1": 19.5,
-    "inst5": 20.2,
+    "inst1": 19.4,
+    "inst5": 20.1,
     "streak": 7.4,
-    "margin": 13.6,
+    "margin": 13.5,
     "big": 12.5,
     "broker": 0
    },
-   "score": 73.2,
+   "score": 72.9,
    "rank": 20,
    "tags": [
     "融資大減"
